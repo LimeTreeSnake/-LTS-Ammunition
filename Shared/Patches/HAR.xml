@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+    <Patch>
+        <Operation Class="PatchOperationAdd">
+            <success>Always</success>
+            <xpath>Defs/AlienRace.ThingDef_AlienRace/alienRace/raceRestriction[not(whiteApparelList)]</xpath>
+            <value>
+                <whiteApparelList />
+            </value>
+        </Operation>
+        <Operation Class="PatchOperationAdd">
+            <success>Always</success>
+            <xpath>Defs/AlienRace.ThingDef_AlienRace/alienRace/raceRestriction/whiteApparelList</xpath>
+            <value>
+                <li>KitPrimitiveSmall</li>
+                <li>KitPrimitiveMedium</li>
+                <li>KitPrimitiveLarge</li>
+                <li>KitMedievalSmall</li>
+                <li>KitMedievalMedium</li>
+                <li>KitMedievalLarge</li>
+                <li>KitIndustrialSmall</li>
+                <li>KitIndustrialMedium</li>
+                <li>KitIndustrialLarge</li>
+                <li>KitExplosiveSmall</li>
+                <li>KitExplosiveMedium</li>
+                <li>KitExplosiveLarge</li>
+                <li>KitSpacerSmall</li>
+                <li>KitSpacerMedium</li>
+                <li>KitSpacerLarge</li>
+                <li>KitArchotechSmall</li>
+                <li>KitArchotechMedium</li>
+                <li>KitArchotechLarge</li>
+                <li MayRequire="joeyjoejoeshabidoo.AirRifles">KitPelletSmall</li>
+                <li MayRequire="joeyjoejoeshabidoo.AirRifles">KitPelletMedium</li>
+                <li MayRequire="joeyjoejoeshabidoo.AirRifles">KitPelletLarge</li>
+            </value>
+        </Operation>
+
+    </Patch>

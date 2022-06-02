@@ -1,0 +1,7 @@
+C:\Users\rikar\Desktop\GIT\Attrition\Source\obj\Debug\Attrition.csproj.CoreCompileInputs.cache
+C:\Users\rikar\Desktop\GIT\Attrition\v1.2\Assemblies\Attrition.dll
+C:\Users\rikar\Desktop\GIT\Attrition\Source\obj\Debug\Attrition.dll
+C:\Users\rikar\Desktop\GIT\Attrition\Source\obj\Debug\Attrition.csprojAssemblyReference.cache
+C:\Users\rikar\Desktop\GIT\LTSMods\Attrition\Source\obj\Debug\Attrition.csproj.CoreCompileInputs.cache
+C:\Users\rikar\Desktop\GIT\LTSMods\Attrition\Source\obj\Debug\Attrition.dll
+C:\Users\rikar\Desktop\GIT\LTSMods\Attrition\v1.2\Assemblies\Attrition.dll

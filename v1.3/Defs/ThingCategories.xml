@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+    <Defs>
+        <ThingCategoryDef>
+            <defName>Kits</defName>
+            <label>kits</label>
+            <parent>Apparel</parent>
+            <iconPath>Kits/IndustrialBag_1</iconPath>
+            <resourceReadoutRoot>true</resourceReadoutRoot>
+        </ThingCategoryDef>
+        <ThingCategoryDef>
+            <defName>Ammunition</defName>
+            <label>ammunition</label>
+            <parent>Manufactured</parent>
+            <iconPath>Icons/AmmoIcon</iconPath>
+        </ThingCategoryDef>
+    </Defs>

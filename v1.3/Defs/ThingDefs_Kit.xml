@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+    <Defs>
+        <ThingDef Name="PackBase" ParentName="ApparelMakeableBase" Abstract="True">
+            <thingClass>Ammunition.Things.Kit</thingClass>
+            <recipeMaker>
+                <recipeUsers>
+                    <li>ElectricTailoringBench</li>
+                    <li>HandTailoringBench</li>
+                    <li MayRequire="DankPyon.Medieval.Overhaul">DankPyon_Workbench</li>
+                    <li>CraftingSpot</li>
+                </recipeUsers>
+            </recipeMaker>
+            <thingCategories>
+                <li>Kits</li>
+            </thingCategories>
+            <stuffCategories>
+                <li>Fabric</li>
+                <li>Leathery</li>
+            </stuffCategories>
+            <soundInteract>Standard_Pickup</soundInteract>
+            <tradeability>All</tradeability>
+        </ThingDef>
+        <ThingDef Name="PackSmallBase" ParentName="PackBase" Abstract="True">
+            <costStuffCount>20</costStuffCount>
+            <statBases>
+                <!-- 0.25 per ammo -->
+                <Mass>2</Mass>
+                <WorkToMake>1000</WorkToMake>
+                <Flammability>0.6</Flammability>
+                <EquipDelay>2</EquipDelay>
+            </statBases>
+            <apparel>
+                <bodyPartGroups>
+                    <li>Waist</li>
+                </bodyPartGroups>
+                <layers>
+                    <li>WeaponKit</li>
+                </layers>
+                <tags>
+                    <li>Archotech</li>
+                </tags>
+            </apparel>
+        </ThingDef>
+        <ThingDef Name="PackMediumBase" ParentName="PackBase" Abstract="True">
+            <costStuffCount>40</costStuffCount>
+            <statBases>
+                <!-- 0.25 per ammo -->
+                <Mass>4</Mass>
+                <WorkToMake>1500</WorkToMake>
+                <Flammability>0.6</Flammability>
+                <EquipDelay>2</EquipDelay>
+            </statBases>
+            <apparel>
+                <bodyPartGroups>
+                    <li>Shoulders</li>
+                </bodyPartGroups>
+                <layers>
+                    <li>WeaponKit</li>
+                </layers>
+                <tags>
+                    <li>Archotech</li>
+                </tags>
+            </apparel>
+        </ThingDef>
+        <ThingDef Name="PackLargeBase" ParentName="PackBase" Abstract="True">
+            <costStuffCount>60</costStuffCount>
+            <statBases>
+                <!-- 0.25 per ammo -->
+                <Mass>6</Mass>
+                <WorkToMake>2000</WorkToMake>
+                <Flammability>0.6</Flammability>
+                <EquipDelay>2</EquipDelay>
+            </statBases>
+            <apparel>
+                <bodyPartGroups>
+                    <li>Torso</li>
+                </bodyPartGroups>
+                <layers>
+                    <li>WeaponKit</li>
+                </layers>
+                <tags>
+                    <li>Archotech</li>
+                </tags>
+            </apparel>
+        </ThingDef>
+    </Defs>

@@ -1,0 +1,27 @@
+﻿2022-05-29
+    - Show only gizmo if 1 pawn is selected, not many.
+    - Made sure mercs from Mercs for me spawns with kits if applicable.
+
+2022-05-26
+    - Remade the HAR patch - Kudos Abraxas!
+
+2022-05-26
+    - Ignore animals option in settings and added checks
+    - Some mod settings QOL
+    - Added HAR patch for races with apparel restrictions. Kudos BBLKepling!
+    - Added custom ignore list for races with very specific body parts that would make it physically impossible to wear kits. (Write to LTS to add a race)
+
+2022-05-16
+    - Kits can be crafted at Workbenches from Medieval Overhaul
+    - Lowered stuffcostcount for kits from 25-50-75 to 20-40-60    
+    - Added another failsafe in "getWornKitForWeaponWithAmmo"
+    - If no apparel tracker found, ignore ammo usage.
+    - Added associated tales with looting ammo.
+    - New loot tool to pilfer ammo from enemies
+    - Right click pilfering on corpses
+
+2022-05-05
+    - Fixed the firing without ammo issue
+    
+2022-05-05
+    - Added the ability to craft Primitive Kits with wood.

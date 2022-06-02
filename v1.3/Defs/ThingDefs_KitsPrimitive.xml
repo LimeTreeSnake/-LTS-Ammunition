@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+    <Defs>
+        <!--==================== Small ======================== -->
+        <ThingDef ParentName="PackSmallBase">
+            <defName>KitPrimitiveSmall</defName>
+            <label>small primitive kit</label>
+            <description>A small kit for carrying primitive munition.</description>
+            <graphicData>
+                <texPath>Kits/PrimitiveBag_0</texPath>
+                <graphicClass>Graphic_Single</graphicClass>
+            </graphicData>
+            <techLevel>Neolithic</techLevel>
+            <stuffCategories>
+                <li>Woody</li>
+            </stuffCategories>
+            <comps>
+                <li Class="Ammunition.Components.CompProps_Kit">
+                    <ammoCapacity>60</ammoCapacity>
+                    <kitCategory>Primitive</kitCategory>
+                </li>
+            </comps>
+        </ThingDef>
+        <!--==================== Medium ======================== -->
+        <ThingDef ParentName="PackMediumBase">
+            <defName>KitPrimitiveMedium</defName>
+            <label>medium primitive kit</label>
+            <description>A kit for carrying primitive munition.</description>
+            <graphicData>
+                <texPath>Kits/PrimitiveBag_1</texPath>
+                <graphicClass>Graphic_Single</graphicClass>
+            </graphicData>
+            <techLevel>Neolithic</techLevel>
+            <stuffCategories>
+                <li>Woody</li>
+            </stuffCategories>
+            <comps>
+                <li Class="Ammunition.Components.CompProps_Kit">
+                    <ammoCapacity>120</ammoCapacity>
+                    <kitCategory>Primitive</kitCategory>
+                </li>
+            </comps>
+        </ThingDef>
+        <!--==================== Large ======================== -->
+        <ThingDef ParentName="PackLargeBase">
+            <defName>KitPrimitiveLarge</defName>
+            <label>large primitive kit</label>
+            <description>A large kit for carrying primitive munition.</description>
+            <graphicData>
+                <texPath>Kits/PrimitiveBag_2</texPath>
+                <graphicClass>Graphic_Single</graphicClass>
+            </graphicData>
+            <techLevel>Neolithic</techLevel>
+            <stuffCategories>
+                <li>Woody</li>
+            </stuffCategories>
+            <comps>
+                <li Class="Ammunition.Components.CompProps_Kit">
+                    <ammoCapacity>240</ammoCapacity>
+                    <kitCategory>Primitive</kitCategory>
+                </li>
+            </comps>
+        </ThingDef>
+    </Defs>
