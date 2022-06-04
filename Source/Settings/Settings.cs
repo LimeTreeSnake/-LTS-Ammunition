@@ -39,6 +39,7 @@ namespace Ammunition.Settings {
         private static bool useMechanoidAmmo = true;
         private static bool useAnimalAmmo = true;
         private static bool hideMultipleGizmos = true;
+        private static bool disableAmmoUsage = false;
         private static AmmoCategoryDef chosenCategory = null;
         private static bool enable, disable, enableMod, disableMod, changesMade;
         private static bool
@@ -57,6 +58,7 @@ namespace Ammunition.Settings {
         public static bool UseMechanoidAmmo => useMechanoidAmmo;
         public static bool UseAnimalAmmo => useAnimalAmmo;
         public static bool HideMultipleGizmos => hideMultipleGizmos;
+        public static bool DisableAmmoUsage => disableAmmoUsage;//DOOOOOO
         public static Dictionary<string, Dictionary<string, bool>> CategoryWeaponDictionary;
         public static Dictionary<string, bool> ExemptionWeaponDictionary;
 
@@ -65,6 +67,7 @@ namespace Ammunition.Settings {
             Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
             Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
             Scribe_Values.Look(ref hideMultipleGizmos, "HideMultipleGizmos", true, false);
+            Scribe_Values.Look(ref disableAmmoUsage, "DisableAmmoUsage", false, false);
             base.ExposeData();
         }
 

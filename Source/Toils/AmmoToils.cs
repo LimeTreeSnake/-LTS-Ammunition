@@ -13,13 +13,22 @@ namespace Ammunition.Toils {
                 toil.initAction = delegate {
                     Pawn actor = toil.actor;
                     Thing thing = actor.CurJob.GetTarget(ind).Thing;
-                    int amount = Mathf.Min(thing.stackCount, kit.MaxCount - kit.Count);
-                    kit.Count += amount;
-                    thing.SplitOff(amount);
-                    thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));
+                    for (int i = 0; i < kit.Props.bags; i++) {
+                        if (kit.Bags[i].ChosenAmmo == thing.def) {
+                            int amount = Mathf.Min(thing.stackCount, kit.Bags[i].MaxCount - kit.Bags[i].Count);
+                            if (amount > 0) {
+                                thing.SplitOff(amount);
+                                kit.Bags[i].Count += amount;
+                                thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));
+                            }
+                            if (amount == thing.stackCount)
+                                break;
+                        }
+                    }
                 };
                 return toil;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Log.Message("LoadMagazine toil Try/Catch error! - " + ex.Message);
                 return null;
             }
@@ -41,10 +50,12 @@ namespace Ammunition.Toils {
                         if (!actor.CanReserve(t)) {
                             return false;
                         }
-                        if (kit.Count >= kit.MaxCount) {
-                            return false;
+                        for (int i = 0; i < kit.Props.bags; i++) {
+                            if (def == kit.Bags[i].ChosenAmmo && kit.Bags[i].Count < kit.Bags[i].MaxCount) {
+                                return true;
+                            }
                         }
-                        return true;
+                        return false;
                     };
                     Thing ammo = GenClosest.ClosestThing_Global_Reachable(actor.Position, actor.Map, actor.Map.listerThings.ThingsOfDef(def), PathEndMode.OnCell, TraverseParms.For(actor), 10, validator);
                     if (ammo != null) {
@@ -53,28 +64,31 @@ namespace Ammunition.Toils {
                     }
                 };
                 return toil;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Log.Message("OpportunisticLoadMagazine toil Try/Catch error! - " + ex.Message);
                 return null;
             }
         }
 
-        public static Toil UnloadKit(TargetIndex ind, Ammunition.Components.KitComponent kit)
-        {
-            try
-            {
+        public static Toil UnloadKit(TargetIndex ind, Ammunition.Components.KitComponent kit) {
+            try {
                 Toil toil = new Toil();
                 toil.initAction = delegate {
                     Pawn actor = toil.actor;
                     Thing thing = actor.CurJob.GetTarget(ind).Thing;
-                    DebugThingPlaceHelper.DebugSpawn(kit.ChosenAmmo, kit.parent.PositionHeld, kit.Count);
-                    kit.Count = 0;
+                    for (int i = 0; i < kit.Props.bags; i++) {
+                        Log.Message(kit.Bags[i].ToString());
+                        if (kit.Bags[i].Count > 0) {
+                            DebugThingPlaceHelper.DebugSpawn(kit.Bags[i].ChosenAmmo, kit.parent.PositionHeld, kit.Bags[i].Count);
+                            kit.Bags[i].Count = 0;
+                        }
+                    }
                     thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));
                 };
                 return toil;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Log.Message("UnloadKit toil Try/Catch error! - " + ex.Message);
                 return null;
             }

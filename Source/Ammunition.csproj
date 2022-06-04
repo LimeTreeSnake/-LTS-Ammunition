@@ -79,6 +79,7 @@
     <Compile Include="Logic\AmmoLogic.cs" />
     <Compile Include="Logic\Enums.cs" />
     <Compile Include="Logic\SaveFile.cs" />
+    <Compile Include="Models\Bag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Things\Ammo.cs" />

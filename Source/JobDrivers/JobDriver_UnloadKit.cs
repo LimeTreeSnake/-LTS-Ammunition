@@ -17,12 +17,11 @@ namespace Ammunition.JobDrivers {
             Toil reserveTargetA = Toils_Reserve.Reserve(TargetIndex.A);
             yield return reserveTargetA;
             yield return Toils_Goto.Goto(TargetIndex.A, PathEndMode.Touch);
-            Apparel apparel = TargetA.Thing as Apparel;
+            Things.Kit kit = TargetA.Thing as Things.Kit;
             // Log.Message(TargetA.Label + " " + TargetB.Label);
-            if (apparel != null) {
-                Components.KitComponent kit = apparel.GetComp<Components.KitComponent>();
+            if (kit != null) {
                 if (kit != null) { 
-                    yield return Toils.Toils_Take.UnloadKit(TargetIndex.A, kit);    
+                    yield return Toils.Toils_Take.UnloadKit(TargetIndex.A, kit.KitComp);    
                 }
             }
             else {

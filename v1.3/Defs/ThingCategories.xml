@@ -4,7 +4,7 @@
             <defName>Kits</defName>
             <label>kits</label>
             <parent>Apparel</parent>
-            <iconPath>Kits/IndustrialBag_1</iconPath>
+            <iconPath>Kits/Kit_Medium</iconPath>
             <resourceReadoutRoot>true</resourceReadoutRoot>
         </ThingCategoryDef>
         <ThingCategoryDef>
