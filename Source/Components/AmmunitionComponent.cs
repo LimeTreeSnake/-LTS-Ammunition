@@ -8,9 +8,11 @@ using Ammunition.Defs;
 
 namespace Ammunition.Components {
 	public class AmmunitionComponent : ThingComp {
-
+		public CompProps_Ammunition Props => (CompProps_Ammunition)props;
 	}
 	public class CompProps_Ammunition  :CompProperties {
+        public ThingDef bulletDef;
+
 		public CompProps_Ammunition() {
 			this.compClass = typeof(AmmunitionComponent);
 		}

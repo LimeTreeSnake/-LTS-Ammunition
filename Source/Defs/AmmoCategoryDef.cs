@@ -10,6 +10,7 @@ namespace Ammunition.Defs {
         public List<string> includeWeaponDefs;
         public List<string> excludeWeaponDefs;
         public AmmoTypes ammoType;
+        public bool autoAssignable = true;
     }
 
     [DefOf]

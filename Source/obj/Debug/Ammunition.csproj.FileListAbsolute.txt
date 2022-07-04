@@ -10,3 +10,7 @@ C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition\v1.3\Assemblies\Ammunition.dl
 C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition\Source\obj\Debug\Ammunition.csproj.AssemblyReference.cache
 C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition\Source\obj\Debug\Ammunition.csproj.CoreCompileInputs.cache
 C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition\Source\obj\Debug\Ammunition.dll
+C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition - Framework\v1.3\Assemblies\Ammunition.dll
+C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition - Framework\Source\obj\Debug\Ammunition.csproj.AssemblyReference.cache
+C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition - Framework\Source\obj\Debug\Ammunition.csproj.CoreCompileInputs.cache
+C:\Users\rikar\Desktop\GIT\LTSMods\[LTS]Ammunition - Framework\Source\obj\Debug\Ammunition.dll

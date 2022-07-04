@@ -17,39 +17,45 @@ namespace Ammunition.Harmony {
             HarmonyLib.Harmony harmony = new HarmonyLib.Harmony("limetreesnake.ammunition");
             harmony.Patch(AccessTools.Method(typeof(WorkGiver_HunterHunt), "HasHuntingWeapon", null, null), null, new HarmonyMethod(typeof(Harmony).GetMethod("HasHuntingWeapon_PostFix")), null, null);
             if (Settings.Settings.UseAmmoPerBullet) {
-                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "TryCastShot"), null, new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PostFix")));
+                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "TryCastShot"), new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PreFix")), null);
             }
             else {
-                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"), null, new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PostFix")));
+                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"), new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PreFix")), null);
             }
+            harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile"), null, new HarmonyMethod(typeof(Harmony).GetMethod("Projectile_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(PawnGenerator), "RedressPawn"), null, new HarmonyMethod(typeof(Harmony).GetMethod("RedressPawn_PostFix")));
-            harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "Available"), null, new HarmonyMethod(typeof(Harmony).GetMethod("Available_PostFix")));
             harmony.Patch(typeof(PawnGenerator).GetMethods().FirstOrDefault(x => x.Name == "GeneratePawn" && x.GetParameters().Count() == 1), null, new HarmonyMethod(typeof(Harmony).GetMethod("GeneratePawn_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(ReverseDesignatorDatabase), "InitDesignators"), null, new HarmonyMethod(typeof(Harmony).GetMethod("InitDesignators_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"), null, new HarmonyMethod(typeof(Harmony).GetMethod("AddHumanlikeOrders_PostFix")));
-            Logic.AmmoLogic.Initialize();
+
 
             Type t = AccessTools.TypeByName("aRandomKiwi.MFM.Utils");
             if (t != null) {
-                Log.Message("great success");
                 harmony.Patch(AccessTools.Method(t, "processMercWeapon"), null, new HarmonyMethod(typeof(Harmony).GetMethod("processMercWeapon_PostFix")));
             }
+            Logic.AmmoLogic.Initialize();
 
         }
         [HarmonyPriority(150)]
-        public static void ConsumeAmmo_PostFix(ref Verb_LaunchProjectile __instance,ref KitComponent __state) {
-            if (__instance.CasterIsPawn && __instance.EquipmentSource != null) {
-                Logic.AmmoLogic.ConsumeAmmo(__instance.CasterPawn, __instance.EquipmentSource);
+        public static bool ConsumeAmmo_PreFix(ref Verb_LaunchProjectile __instance) {
+            return Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
+        }
+        [HarmonyPriority(150)]
+        public static void Projectile_PostFix(ref Verb_LaunchProjectile __instance, ref ThingDef __result) {
+            if (__result == null)
+                return;
+            if (Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out KitComponent comp, false)) {
+                if (comp != null && comp.LastUsedBullet != null) {
+                    __result = comp.LastUsedBullet;
+                }
+            }
+            else {
+                __result = null;
             }
         }
         public static void HasHuntingWeapon_PostFix(ref Pawn p, ref bool __result) {
             if (__result) {
-                __result = Logic.AmmoLogic.AmmoCheck(p, p.equipment.Primary, out _);
-            }
-        }
-        public static void Available_PostFix(Verb_LaunchProjectile __instance, ref bool __result) {
-            if (__result) {
-                __result = Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _);
+                __result = Logic.AmmoLogic.AmmoCheck(p, p.equipment.Primary, out _, false);
             }
         }
         public static void GeneratePawn_PostFix(ref Pawn __result) {
@@ -57,13 +63,12 @@ namespace Ammunition.Harmony {
                 Logic.AmmoLogic.EquipPawn(__result);
             }
         }
-
         public static void RedressPawn_PostFix(ref Pawn pawn) {
             if (pawn != null && pawn.apparel != null) {
                 Logic.AmmoLogic.EquipPawn(pawn);
             }
         }
-        public static void processMercWeapon_PostFix(ref Pawn p) {
+        public static void ProcessMercWeapon_PostFix(ref Pawn p) {
             if (p != null && p.apparel != null) {
                 Logic.AmmoLogic.EquipPawn(p);
             }

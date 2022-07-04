@@ -14,10 +14,10 @@ namespace Ammunition.Gizmos {
 
         private static readonly Texture2D DropIcon = ContentFinder<Texture2D>.Get("UI/Buttons/Dismiss", true);
         public KitComponent kitComp;
-        float pocketWidth = 55f;
-        float columnWidth = 75;
-        float unloadWidth = 15f;
-        float margin = 5f;
+        readonly float pocketWidth = 50;
+        readonly float columnWidth = 75;
+        readonly float unloadWidth = 20f;
+        readonly float margin = 2f;
 
         private static readonly Texture2D FullAmmoBarTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.5f, 0.5f, 0.6f));
         private static readonly Texture2D BackgroundTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.1f, 0.1f, 0.1f, 0.75f));
@@ -34,7 +34,7 @@ namespace Ammunition.Gizmos {
                 try {
                     Rect borderRect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
                     Material material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
-                    GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex, material, default(Rect));
+                    GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex, material, default);
                     for (int i = 0; i < kitComp.Props.bags; i++) {
                         if (kitComp.Bags[i].ChosenAmmo == null)
                             kitComp.Bags[i].ChosenAmmo = AmmoLogic.AvailableAmmo.First();
@@ -42,14 +42,17 @@ namespace Ammunition.Gizmos {
                         int x = (int)(columnWidth * column);
                         Rect innerRect;
                         innerRect = i % 2 == 0 ? borderRect.ContractedBy(margin).TopHalf() : borderRect.ContractedBy(margin).BottomHalf();
-
                         innerRect.width = columnWidth - margin;
                         innerRect.x = borderRect.x + ((x - columnWidth)) + (margin / 2);
                         if (i < 2)
                             innerRect.x += margin / 2;
+                        Widgets.DrawWindowBackground(innerRect.LeftPartPixels(columnWidth - (margin*2)));
                         Rect recLeft = innerRect.LeftPartPixels(pocketWidth).ContractedBy(1f);
+                        recLeft.x += margin;
                         Rect recRightTop = innerRect.RightPartPixels(unloadWidth + margin / 2).ContractedBy(1f).TopHalf();
+                        recRightTop.x -= margin;
                         Rect recRightBot = innerRect.RightPartPixels(unloadWidth + margin / 2).ContractedBy(1f).BottomHalf();
+                        recRightTop.x -= margin;
                         if (Mouse.IsOver(recLeft.TopHalf())) {
                             Widgets.DrawHighlight(recLeft.TopHalf());
                         }
@@ -60,12 +63,11 @@ namespace Ammunition.Gizmos {
                         Widgets.DrawTextureFitted(recLeft.ExpandedBy(margin / 2), kitComp.Bags[i].ChosenAmmo != null ? Widgets.GetIconFor(kitComp.Bags[i].ChosenAmmo) : Widgets.GetIconFor(kitComp.parent.def), 1);
                         GUI.DrawTexture(recLeft.TopHalf(), BackgroundTex);
                         Text.Font = GameFont.Small;
-                        Text.Anchor = TextAnchor.MiddleLeft;
+                        Text.Anchor = TextAnchor.UpperLeft;
                         Widgets.Label(recLeft, (i + 1).ToString());
                         Text.Font = GameFont.Tiny;
                         Text.Anchor = TextAnchor.LowerCenter;
-                        kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider(recLeft, kitComp.Bags[i].MaxCount, 0f, kitComp.Props.ammoCapacity[i], true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
-
+                        kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider(recLeft.BottomHalf(), kitComp.Bags[i].MaxCount, 0f, kitComp.Props.ammoCapacity[i], true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
                         Text.Font = GameFont.Tiny;
                         Text.Anchor = TextAnchor.MiddleCenter;
                         Widgets.Dropdown(recLeft.TopHalf(), kitComp.Bags[i], (Models.Bag bag) => kitComp.Bags[i].ChosenAmmo, GenerateAmmoMenu, kitComp.Bags[i].ChosenAmmo?.LabelCap, BaseContent.ClearTex);

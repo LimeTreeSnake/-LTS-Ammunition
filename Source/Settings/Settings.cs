@@ -13,7 +13,7 @@ using RimWorld;
 namespace Ammunition.Settings {
     public class AmmunitionSettings : Mod {
 
-        private Settings settings;
+        private readonly Settings settings;
 
         public AmmunitionSettings(ModContentPack content) : base(content) {
             settings = GetSettings<Settings>();
@@ -32,8 +32,8 @@ namespace Ammunition.Settings {
 
     public class Settings : ModSettings {
 
-        public Texture2D ammo_Disabled => ContentFinder<Texture2D>.Get("Icons/Ammo_disabled", true);
-        public Texture2D ammo_Enabled => ContentFinder<Texture2D>.Get("Icons/Ammo_enabled", true);
+        public Texture2D Ammo_Disabled => ContentFinder<Texture2D>.Get("Icons/Ammo_disabled", true);
+        public Texture2D Ammo_Enabled => ContentFinder<Texture2D>.Get("Icons/Ammo_enabled", true);
         #region Fields
         private static bool useAmmoPerBullet = false;
         private static bool useMechanoidAmmo = true;
@@ -129,6 +129,7 @@ namespace Ammunition.Settings {
                     Rect AmmoRect = list.GetRect(lineHeight * 2f);
                     Rect TextRect = list.GetRect(lineHeight * 1f);
                     for (int i = 0; i < chosenCategory.ammoDefs.Count; i++) {
+                        Log.Message(i.ToString());
                         ThingDef tempDef = DefDatabase<ThingDef>.GetNamed(chosenCategory.ammoDefs[i]);
                         Rect tempRect = new Rect((AmmoRect.x + (float)(i * lineHeight * 2f)), AmmoRect.y, lineHeight * 2, lineHeight * 2);
                         Widgets.DrawTextureFitted(tempRect, tempDef.graphic.MatSingle.mainTexture, 1);
@@ -234,9 +235,7 @@ namespace Ammunition.Settings {
                             }
                             Rect weaponRect = WeaponsList.GetRect(lineHeight);
                             Rect mainWeaponRect = weaponRect.LeftPartPixels(weaponRect.width - 25);
-
                             Rect subWeaponRect = weaponRect.RightPartPixels(25f);
-                            float curY = weaponRect.y;
                             CategoryWeaponDictionary.TryGetValue(chosenCategory.defName, out Dictionary<string, bool> dic);
                             dic.TryGetValue(thingDef.defName, out bool res);
                             ExemptionWeaponDictionary.TryGetValue(thingDef.defName, out bool exemption);
@@ -266,7 +265,7 @@ namespace Ammunition.Settings {
                                 changesMade = true;
                             }
                             TooltipHandler.TipRegion(subWeaponRect, Translate.ExemptWeapon);
-                            Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false, ammo_Disabled, ammo_Enabled);
+                            Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false, Ammo_Disabled, Ammo_Enabled);
                             if (val2 != exemption) {
                                 Log.Message(val2 + " exemption");
                                 ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, val2);

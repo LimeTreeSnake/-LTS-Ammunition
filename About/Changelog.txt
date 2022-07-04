@@ -1,4 +1,12 @@
-﻿2022-05-29
+﻿2022-06-23
+    - Patched the vanilla starting scenarios to include kits
+    - Updated Gizmo Graphics to ensure better control and view. No more multi select.
+    - Added custom bullet functionality to ammo. Add a bullet def to the ammo and that will be used instead of default ammo verb.
+
+2022-06-06
+    - Remade the kit system, apologies for the inconvenience as all prior kits are now void and deleted. Now gizmo with pockets are added and fewer kits with selectable ammos.
+
+2022-05-29
     - Show only gizmo if 1 pawn is selected, not many.
     - Made sure mercs from Mercs for me spawns with kits if applicable.
 
