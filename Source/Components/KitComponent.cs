@@ -45,6 +45,18 @@ namespace Ammunition.Components {
             base.PostExposeData();
             Scribe_Collections.Look(ref bags, "Bags", LookMode.Deep);
         }
+        public override void Notify_Unequipped(Pawn pawn) {
+            base.Notify_Unequipped(pawn);
+            Unload(pawn.PositionHeld);
+        }
+        public void Unload(IntVec3 pos) {
+            foreach (Bag bag in bags) {
+                if (bag.Count > 0) {
+                    DebugThingPlaceHelper.DebugSpawn(bag.ChosenAmmo, pos, bag.Count);
+                    bag.Count = 0;
+                }
+            }
+        }
     }
 
     public class CompProps_Kit : CompProperties {

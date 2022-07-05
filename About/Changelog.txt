@@ -1,4 +1,10 @@
-﻿2022-06-23
+﻿2022-07-
+    - Unequipped kits drop ammo
+    - Fixed melee hunting weapon alert triggered.
+    - Added apparel tag to kits, hopefully remove kit spawns from initial pawn creation affecting apparel cost.
+    - Removed weapons that also are apparel from the list of available weapons.
+
+2022-06-23
     - Patched the vanilla starting scenarios to include kits
     - Updated Gizmo Graphics to ensure better control and view. No more multi select.
     - Added custom bullet functionality to ammo. Add a bullet def to the ammo and that will be used instead of default ammo verb.

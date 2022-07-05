@@ -18,7 +18,6 @@ namespace Ammunition.JobDrivers {
             yield return reserveTargetA;
             yield return Toils_Goto.Goto(TargetIndex.A, PathEndMode.Touch);
             Things.Kit kit = TargetA.Thing as Things.Kit;
-            // Log.Message(TargetA.Label + " " + TargetB.Label);
             if (kit != null) {
                 if (kit != null) { 
                     yield return Toils.Toils_Take.UnloadKit(TargetIndex.A, kit.KitComp);    

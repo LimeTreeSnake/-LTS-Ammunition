@@ -101,7 +101,6 @@ namespace Ammunition.Gizmos {
                 if (ammoDef != bag.ChosenAmmo)
                     yield return new Widgets.DropdownMenuElement<ThingDef>() {
                         option = new FloatMenuOption(ammoDef.label, delegate () {
-                            Log.Message(bag.Count.ToString());
                             if (bag.Count > 0) {
                                 {
                                     DebugThingPlaceHelper.DebugSpawn(bag.ChosenAmmo, kitComp.parent.PositionHeld, bag.Count);

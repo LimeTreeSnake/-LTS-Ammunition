@@ -17,7 +17,7 @@ namespace Ammunition.Logic {
         /// <summary>
         /// Returns all equipable weapons that fires projectiles.
         /// </summary>
-        public static IEnumerable<ThingDef> AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.IsWeaponUsingProjectiles && x.HasComp(typeof(CompEquippable)) && x.IsWithinCategory(ThingCategoryDefOf.Weapons));
+        public static IEnumerable<ThingDef> AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.IsWeaponUsingProjectiles && x.HasComp(typeof(CompEquippable)) && x.IsWithinCategory(ThingCategoryDefOf.Weapons) && !x.IsApparel);
         /// <summary>
         /// Returns all thingdefs with an ammunition component.
         /// </summary>
@@ -184,13 +184,17 @@ namespace Ammunition.Logic {
                 }
             }
             catch (Exception ex) {
-                Log.Message("EquipPawn error! - " + ex.Message);
+                Log.Error("EquipPawn error! - " + ex.Message);
             }
         }
         internal static void Initialize(bool load = true) {
             try {
                 if (load)
                     Load();
+                if (!AmmoCategoryDefs.Any()) {
+                    Log.Error("There are no ammo mods installed, only the framework!");
+                    return;
+                }
                 foreach (AmmoCategoryDef category in AmmoCategoryDefs) {
                     List<ThingDef> ammoList = AmmoTypesList(category.ammoType);
                     foreach (string ammoStringDef in category.ammoDefs) {
@@ -213,7 +217,7 @@ namespace Ammunition.Logic {
                 }
             }
             catch (Exception ex) {
-                Log.Message("Error initializing Ammunition Framework: " + ex.Message);
+                Log.Error("Error initializing Ammunition Framework: " + ex.Message);
             }
         }
         internal static void ResetInitialize() {
@@ -267,6 +271,8 @@ namespace Ammunition.Logic {
             kitComp = null;
             try {
                 if (pawn.DestroyedOrNull() || weapon.DestroyedOrNull())
+                    return true;
+                if (weapon.def.IsMeleeWeapon || !AmmoCategoryDefs.Any())
                     return true;
                 if ((pawn.RaceProps.IsMechanoid && !Settings.Settings.UseMechanoidAmmo) || (pawn.RaceProps.Animal && !Settings.Settings.UseAnimalAmmo))
                     return true;

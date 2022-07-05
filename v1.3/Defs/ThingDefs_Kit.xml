@@ -24,6 +24,9 @@
                 <bodyPartGroups>
                     <li>Waist</li>
                 </bodyPartGroups>
+                <tags>
+                    <li>Kits</li>
+                </tags>
                 <layers>
                     <li>WeaponKit</li>
                 </layers>

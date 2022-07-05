@@ -14,7 +14,7 @@ namespace Ammunition.Alerts
             {
                 this.shootersWithoutAmmo.Clear();
                 foreach (Pawn current in PawnsFinder.AllMaps_FreeColonists)
-                {
+                {                    
                     if ((current.Spawned || current.BrieflyDespawned()) && (!HealthAIUtility.ShouldSeekMedicalRest(current) || !current.InBed()) && !current.Downed && !Logic.AmmoLogic.AmmoCheck(current, current?.equipment?.Primary, out _, false))
                     {
                         this.shootersWithoutAmmo.Add(current);

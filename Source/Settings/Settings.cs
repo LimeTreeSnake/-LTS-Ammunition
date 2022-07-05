@@ -129,7 +129,6 @@ namespace Ammunition.Settings {
                     Rect AmmoRect = list.GetRect(lineHeight * 2f);
                     Rect TextRect = list.GetRect(lineHeight * 1f);
                     for (int i = 0; i < chosenCategory.ammoDefs.Count; i++) {
-                        Log.Message(i.ToString());
                         ThingDef tempDef = DefDatabase<ThingDef>.GetNamed(chosenCategory.ammoDefs[i]);
                         Rect tempRect = new Rect((AmmoRect.x + (float)(i * lineHeight * 2f)), AmmoRect.y, lineHeight * 2, lineHeight * 2);
                         Widgets.DrawTextureFitted(tempRect, tempDef.graphic.MatSingle.mainTexture, 1);
@@ -267,7 +266,6 @@ namespace Ammunition.Settings {
                             TooltipHandler.TipRegion(subWeaponRect, Translate.ExemptWeapon);
                             Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false, Ammo_Disabled, Ammo_Enabled);
                             if (val2 != exemption) {
-                                Log.Message(val2 + " exemption");
                                 ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, val2);
                                 changesMade = true;
                             }
@@ -291,7 +289,7 @@ namespace Ammunition.Settings {
                 Write();
             }
             catch (Exception ex) {
-                Log.Message(ex.Message);
+                Log.Error(ex.Message);
             }
         }
         public static IEnumerable<Widgets.DropdownMenuElement<AmmoCategoryDef>> GenerateAmmoCategoryMenu(AmmoCategoryDef def) {

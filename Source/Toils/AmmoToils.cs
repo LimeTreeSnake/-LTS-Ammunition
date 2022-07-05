@@ -29,7 +29,7 @@ namespace Ammunition.Toils {
                 return toil;
             }
             catch (Exception ex) {
-                Log.Message("LoadMagazine toil Try/Catch error! - " + ex.Message);
+                Log.Error("LoadMagazine toil Try/Catch error! - " + ex.Message);
                 return null;
             }
         }
@@ -66,7 +66,7 @@ namespace Ammunition.Toils {
                 return toil;
             }
             catch (Exception ex) {
-                Log.Message("OpportunisticLoadMagazine toil Try/Catch error! - " + ex.Message);
+                Log.Error("OpportunisticLoadMagazine toil Try/Catch error! - " + ex.Message);
                 return null;
             }
         }
@@ -77,19 +77,13 @@ namespace Ammunition.Toils {
                 toil.initAction = delegate {
                     Pawn actor = toil.actor;
                     Thing thing = actor.CurJob.GetTarget(ind).Thing;
-                    for (int i = 0; i < kit.Props.bags; i++) {
-                        Log.Message(kit.Bags[i].ToString());
-                        if (kit.Bags[i].Count > 0) {
-                            DebugThingPlaceHelper.DebugSpawn(kit.Bags[i].ChosenAmmo, kit.parent.PositionHeld, kit.Bags[i].Count);
-                            kit.Bags[i].Count = 0;
-                        }
-                    }
+                    kit.Unload(thing.PositionHeld);
                     thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));
                 };
                 return toil;
             }
             catch (Exception ex) {
-                Log.Message("UnloadKit toil Try/Catch error! - " + ex.Message);
+                Log.Error("UnloadKit toil Try/Catch error! - " + ex.Message);
                 return null;
             }
         }
