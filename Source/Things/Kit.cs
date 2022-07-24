@@ -13,24 +13,24 @@ namespace Ammunition.Things {
     [StaticConstructorOnStartup]
     public class Kit : Apparel {
         private KitComponent kitComp;
-        public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn) {
-            foreach (FloatMenuOption floatMenuOption in base.GetFloatMenuOptions(selPawn)) {
-                yield return floatMenuOption;
-            }
-            Initiate();
-            if (selPawn.Faction.IsPlayer && selPawn.RaceProps.intelligence > Intelligence.Animal) {
-                if (kitComp != null && kitComp.Bags.Where(x => x.Count > 0).Any()) {
-                    void unloadKit() {
-                        Job job = JobMaker.MakeJob(Defs.JobDefOf.LTS_UnloadKit, this, selPawn);
-                        job.playerForced = true;
-                        selPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc, false);
-                    };
-                    FloatMenuOption opt = new FloatMenuOption(Language.Translate.UnloadKit, unloadKit);
-                    yield return opt;
-                }
-            }
-            yield break;
-        }
+        //public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn) {
+        //    foreach (FloatMenuOption floatMenuOption in base.GetFloatMenuOptions(selPawn)) {
+        //        yield return floatMenuOption;
+        //    }
+        //    Initiate();
+        //    if (selPawn.Faction.IsPlayer && selPawn.RaceProps.intelligence > Intelligence.Animal) {
+        //        if (kitComp != null && kitComp.Bags.Where(x => x.Count > 0).Any()) {
+        //            void unloadKit() {
+        //                Job job = JobMaker.MakeJob(Defs.JobDefOf.LTS_UnloadKit, this, selPawn);
+        //                job.playerForced = true;
+        //                selPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc, false);
+        //            };
+        //            FloatMenuOption opt = new FloatMenuOption(Language.Translate.UnloadKit, unloadKit);
+        //            yield return opt;
+        //        }
+        //    }
+        //    yield break;
+        //}
         public void Initiate() {
             if (kitComp == null) {
                 kitComp = (KitComponent)AllComps.FirstOrDefault(x => x is KitComponent);
