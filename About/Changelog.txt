@@ -1,4 +1,4 @@
-﻿2022-07-
+﻿2022-08-07
     - Unequipped kits drop ammo
     - Fixed melee hunting weapon alert triggered.
     - Added apparel tag to kits, hopefully remove kit spawns from initial pawn creation affecting apparel cost.
