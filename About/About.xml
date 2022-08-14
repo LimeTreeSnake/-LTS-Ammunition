@@ -1,23 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-    <ModMetaData>
-        <name>[LTS]Ammunition - Framework</name>
-        <author>LimeTreeSnake</author>
-        <supportedVersions>
-            <li>1.3</li>
-        </supportedVersions>
-        <packageId>LimeTreeSnake.Ammunition</packageId>
-        <description>
+<ModMetaData>
+    <name>[LTS]Ammunition - Framework</name>
+    <author>LimeTreeSnake</author>
+    <supportedVersions>
+        <li>1.3</li>
+    </supportedVersions>
+    <packageId>LimeTreeSnake.Ammunition</packageId>
+    <description>
             -License- Code by LTS, art by ELIF and everything owned by LTS. Contact LTS for any inquiries.
         </description>
-        <modDependencies>
-            <li>
-                <packageId>brrainz.harmony</packageId>
-                <displayName>Harmony</displayName>
-                <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-                <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
-            </li>
-        </modDependencies>
-        <loadAfter>
-            <li>brrainz.harmony</li>
-        </loadAfter>
-    </ModMetaData>
+    <modDependencies>
+        <li>
+            <packageId>brrainz.harmony</packageId>
+            <displayName>Harmony</displayName>
+            <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+            <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+        </li>
+    </modDependencies>
+    <loadAfter>
+        <li>brrainz.harmony</li>
+        <li>LimeTreeSnake.Systems</li>
+    </loadAfter>
+</ModMetaData>
