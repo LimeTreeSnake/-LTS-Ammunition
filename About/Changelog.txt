@@ -8,6 +8,7 @@
     - Added a new DefModExtension which allows modders to exclude their weapons from using ammo as a default setting.
         Usage: add this to mod extensions (MayRequire="LimeTreeSnake.Ammunition" Class="Ammunition.DefModExtensions.ExemptAmmoUsageExtension")
     - If a weapon does not exist in the mod settings, then it shan't be accounted for by this mod. This should fix issues for people with special modded weapons and armor.
+    - Fixed issue with bursts running out of bullets.
     
 2022-08-07
     - Unequipped kits drop ammo

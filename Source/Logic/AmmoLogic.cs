@@ -297,19 +297,17 @@ namespace Ammunition.Logic {
                     return true;
                 if ((pawn.RaceProps.IsMechanoid && !Settings.Settings.UseMechanoidAmmo) || (pawn.RaceProps.Animal && !Settings.Settings.UseAnimalAmmo))
                     return true;
-                if (!Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weapon.def.defName, out bool exempt)) {
+                if (!Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weapon.def.defName, out bool exempt) || exempt) {
                     return true;
                 }
-                if (exempt)
-                    return true;
-                //If all prior fails, this means the weapon needs ammo.
+                //If all prior "fails", this means the weapon needs ammo.
                 if (pawn.apparel != null && pawn.apparel.WornApparelCount > 0) {
                     List<Things.Kit> kits = GetWornKits(pawn);
                     if (kits.Any()) {
                         foreach (Things.Kit kit in kits) {
                             kitComp = kit.KitComp;
                             for (int i = 0; i < kitComp.Props.bags; i++) {
-                                if (kitComp.Bags[i].Use && kitComp.Bags[i].Count > 0 && kitComp.Bags[i].ChosenAmmo != null) {
+                                if (kitComp.Bags[i].Use && kitComp.Bags[i].ChosenAmmo != null && kitComp.Bags[i].Count > 0) {
                                     string defName = kitComp.Bags[i].ChosenAmmo.defName;
                                     IEnumerable<AmmoCategoryDef> ammoCatList = AmmoCategoryDefs.Where(x => x.ammoDefs.Contains(defName));
                                     if (ammoCatList.Any()) {
@@ -333,9 +331,10 @@ namespace Ammunition.Logic {
                                 }
                             }
                         }
+                        kitComp = null;
+                        return false;
                     }
                 }
-                kitComp = null;
             }
             catch (Exception ex) {
                 if (kitComp != null) {
@@ -343,6 +342,7 @@ namespace Ammunition.Logic {
                 }
                 Log.Error("Failure in getUsableKitCompForWeapon: " + ex.Message);
             }
+            kitComp = null;
             return false;
         }
 

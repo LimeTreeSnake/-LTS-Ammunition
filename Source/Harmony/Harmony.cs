@@ -17,10 +17,10 @@ namespace Ammunition.Harmony {
             HarmonyLib.Harmony harmony = new HarmonyLib.Harmony("limetreesnake.ammunition");
             harmony.Patch(AccessTools.Method(typeof(WorkGiver_HunterHunt), "HasHuntingWeapon", null, null), null, new HarmonyMethod(typeof(Harmony).GetMethod("HasHuntingWeapon_PostFix")), null, null);
             if (Settings.Settings.UseAmmoPerBullet) {
-                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "TryCastShot"), new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PreFix")), null);
+                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "TryCastShot"), new HarmonyMethod(typeof(Harmony).GetMethod("TryCastShot_PreFix")), null);
             }
             else {
-                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"), new HarmonyMethod(typeof(Harmony).GetMethod("ConsumeAmmo_PreFix")), null);
+                harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"), new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PreFix")), null);
             }
             harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile"), null, new HarmonyMethod(typeof(Harmony).GetMethod("Projectile_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(PawnGenerator), "RedressPawn"), null, new HarmonyMethod(typeof(Harmony).GetMethod("RedressPawn_PostFix")));
@@ -37,8 +37,13 @@ namespace Ammunition.Harmony {
 
         }
         [HarmonyPriority(150)]
-        public static bool ConsumeAmmo_PreFix(ref Verb_LaunchProjectile __instance) {
+        public static bool WarmupComplete_PreFix(ref Verb_LaunchProjectile __instance) {
             return Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
+        }
+        [HarmonyPriority(150)]
+        public static bool TryCastShot_PreFix(ref Verb_LaunchProjectile __instance, ref bool __result) {
+            __result = Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
+            return __result;
         }
         [HarmonyPriority(150)]
         public static void Projectile_PostFix(ref Verb_LaunchProjectile __instance, ref ThingDef __result) {
