@@ -1,117 +1,117 @@
-<?xml version="1.0" encoding="utf-8" ?>
-    <Defs>
-        <ThingDef Name="PackBase" ParentName="ApparelMakeableBase" Abstract="True">
-            <thingClass>Ammunition.Things.Kit</thingClass>
-            <techLevel>Industrial</techLevel>
-            <recipeMaker>
-                <recipeUsers>
-                    <li>ElectricTailoringBench</li>
-                    <li>HandTailoringBench</li>
-                    <li MayRequire="DankPyon.Medieval.Overhaul">DankPyon_Workbench</li>
-                    <li>CraftingSpot</li>
-                </recipeUsers>
-            </recipeMaker>
-            <thingCategories>
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ThingDef Name="PackBase" ParentName="ApparelMakeableBase" Abstract="True">
+        <thingClass>Ammunition.Things.Kit</thingClass>
+        <techLevel>Industrial</techLevel>
+        <recipeMaker>
+            <recipeUsers>
+                <li>ElectricTailoringBench</li>
+                <li>HandTailoringBench</li>
+                <li MayRequire="DankPyon.Medieval.Overhaul">DankPyon_Workbench</li>
+                <li>CraftingSpot</li>
+            </recipeUsers>
+        </recipeMaker>
+        <thingCategories>
+            <li>Kits</li>
+        </thingCategories>
+        <stuffCategories>
+            <li>Fabric</li>
+            <li>Leathery</li>
+        </stuffCategories>
+        <soundInteract>Standard_Pickup</soundInteract>
+        <tradeability>All</tradeability>
+        <apparel>
+            <bodyPartGroups>
+                <li>Waist</li>
+            </bodyPartGroups>
+            <tags>
                 <li>Kits</li>
-            </thingCategories>
-            <stuffCategories>
-                <li>Fabric</li>
-                <li>Leathery</li>
-            </stuffCategories>
-            <soundInteract>Standard_Pickup</soundInteract>
-            <tradeability>All</tradeability>
-            <apparel>
-                <bodyPartGroups>
-                    <li>Waist</li>
-                </bodyPartGroups>
-                <tags>
-                    <li>Kits</li>
-                </tags>
-                <layers>
-                    <li>WeaponKit</li>
-                </layers>
-            </apparel>
-        </ThingDef>
-        <ThingDef ParentName="PackBase">
-            <defName>LTS_KitSmall</defName>
-            <label>small kit</label>
-            <description>A small kit for carrying munition.</description>
-            <graphicData>
-                <texPath>Kits/Kit_Small</texPath>
-                <graphicClass>Graphic_Single</graphicClass>
-            </graphicData>
-            <statBases>
-                <!-- 0.25 per ammo -->
-                <Mass>2</Mass>
-                <WorkToMake>1000</WorkToMake>
-                <Flammability>0.6</Flammability>
-                <EquipDelay>2</EquipDelay>
-            </statBases>
-            <costStuffCount>20</costStuffCount>
-            <comps>
-                <li Class="Ammunition.Components.CompProps_Kit">
-                    <ammoCapacity>
-                        <li>30</li>
-                        <li>30</li>
-                    </ammoCapacity>
-                    <bags>2</bags>
-                </li>
-            </comps>
-        </ThingDef>
+            </tags>
+            <layers>
+                <li>WeaponKit</li>
+            </layers>
+        </apparel>
+    </ThingDef>
+    <ThingDef ParentName="PackBase">
+        <defName>LTS_KitSmall</defName>
+        <label>small kit</label>
+        <description>A small kit for carrying munition.</description>
+        <graphicData>
+            <texPath>Kits/Kit_Small</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <statBases>
+            <!-- 0.25 per ammo -->
+            <Mass>2</Mass>
+            <WorkToMake>1000</WorkToMake>
+            <Flammability>0.6</Flammability>
+            <EquipDelay>2</EquipDelay>
+        </statBases>
+        <costStuffCount>20</costStuffCount>
+        <comps>
+            <li Class="Ammunition.Components.CompProps_Kit">
+                <ammoCapacity>
+                    <li>30</li>
+                    <li>30</li>
+                </ammoCapacity>
+                <bags>2</bags>
+            </li>
+        </comps>
+    </ThingDef>
 
-        <ThingDef ParentName="PackBase">
-            <defName>LTS_KitMedium</defName>
-            <label>medium kit</label>
-            <description>A kit for carrying munition.</description>
-            <graphicData>
-                <texPath>Kits/Kit_Medium</texPath>
-                <graphicClass>Graphic_Single</graphicClass>
-            </graphicData>
-            <costStuffCount>40</costStuffCount>
-            <statBases>
-                <!-- 0.25 per ammo -->
-                <Mass>4</Mass>
-                <WorkToMake>1500</WorkToMake>
-                <Flammability>0.6</Flammability>
-                <EquipDelay>2</EquipDelay>
-            </statBases>
-            <comps>
-                <li Class="Ammunition.Components.CompProps_Kit">
-                    <ammoCapacity>
-                        <li>60</li>
-                        <li>60</li>
-                    </ammoCapacity>
-                    <bags>2</bags>
-                </li>
-            </comps>
-        </ThingDef>
+    <ThingDef ParentName="PackBase">
+        <defName>LTS_KitMedium</defName>
+        <label>medium kit</label>
+        <description>A kit for carrying munition.</description>
+        <graphicData>
+            <texPath>Kits/Kit_Medium</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <costStuffCount>40</costStuffCount>
+        <statBases>
+            <!-- 0.25 per ammo -->
+            <Mass>4</Mass>
+            <WorkToMake>1500</WorkToMake>
+            <Flammability>0.6</Flammability>
+            <EquipDelay>2</EquipDelay>
+        </statBases>
+        <comps>
+            <li Class="Ammunition.Components.CompProps_Kit">
+                <ammoCapacity>
+                    <li>60</li>
+                    <li>60</li>
+                </ammoCapacity>
+                <bags>2</bags>
+            </li>
+        </comps>
+    </ThingDef>
 
-        <ThingDef ParentName="PackBase">
-            <defName>LTS_KitLarge</defName>
-            <label>large kit</label>
-            <description>A large kit for carrying munition.</description>
-            <graphicData>
-                <texPath>Kits/Kit_Large</texPath>
-                <graphicClass>Graphic_Single</graphicClass>
-            </graphicData>
-            <costStuffCount>60</costStuffCount>
-            <statBases>
-                <!-- 0.25 per ammo -->
-                <Mass>6</Mass>
-                <WorkToMake>2000</WorkToMake>
-                <Flammability>0.6</Flammability>
-                <EquipDelay>2</EquipDelay>
-            </statBases>
-            <comps>
-                <li Class="Ammunition.Components.CompProps_Kit">
-                    <ammoCapacity>
-                        <li>60</li>
-                        <li>60</li>
-                        <li>60</li>
-                        <li>60</li>
-                    </ammoCapacity>
-                    <bags>4</bags>
-                </li>
-            </comps>
-        </ThingDef>
-    </Defs>
+    <ThingDef ParentName="PackBase">
+        <defName>LTS_KitLarge</defName>
+        <label>large kit</label>
+        <description>A large kit for carrying munition.</description>
+        <graphicData>
+            <texPath>Kits/Kit_Large</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <costStuffCount>60</costStuffCount>
+        <statBases>
+            <!-- 0.25 per ammo -->
+            <Mass>6</Mass>
+            <WorkToMake>2000</WorkToMake>
+            <Flammability>0.6</Flammability>
+            <EquipDelay>2</EquipDelay>
+        </statBases>
+        <comps>
+            <li Class="Ammunition.Components.CompProps_Kit">
+                <ammoCapacity>
+                    <li>60</li>
+                    <li>60</li>
+                    <li>60</li>
+                    <li>60</li>
+                </ammoCapacity>
+                <bags>4</bags>
+            </li>
+        </comps>
+    </ThingDef>
+</Defs>

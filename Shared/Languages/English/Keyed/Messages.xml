@@ -1,37 +1,38 @@
-<?xml version="1.0" encoding="utf-8" ?>
-    <LanguageData>
-        <!--Mod Settings-->
-        <LTSAmmunition>Ammunition</LTSAmmunition>
-        <LTSAmmoCategorySelection>Selected ammo category</LTSAmmoCategorySelection>
-        <LTSAmmoCategoryOptions>Options for category</LTSAmmoCategoryOptions>
-        <LTSAnimalAmmo>Animals require ammo</LTSAnimalAmmo>
-        <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
-        <LTSAvailableAmmoCategory>Available ammunition within current category.</LTSAvailableAmmoCategory>
-        <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
-        <LTSWeapons>Weapons</LTSWeapons>
-        <LTSEnable>Enable All Filtered</LTSEnable>
-        <LTSDisable>Disable All Filtered</LTSDisable>
-        <LTSEnableMod>Enable usage For Filtered</LTSEnableMod>
-        <LTSDisableMod>Disable usage For Filtered</LTSDisableMod>
-        <LTSDefaultAssociation>Set Defaults For Filtered</LTSDefaultAssociation>
-        <LTSFilter>Filter options</LTSFilter>
-        <LTSExemptWeapon>If checked, this weapon requires ammo.</LTSExemptWeapon>
-        <LTSUseAmmo>If checked, this weapon can use {0}</LTSUseAmmo>
-        <LTSMechanoidAmmo>Mechanoids require ammo</LTSMechanoidAmmo>
-        <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
-        <LTSPerBullet>Ammo per bullet</LTSPerBullet>
-        <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
-        <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
-        <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <!--Mod Settings-->
+    <LTSAmmunition>Ammunition</LTSAmmunition>
+    <LTSAmmunitionDefault>Default</LTSAmmunitionDefault>
+    <LTSAmmunitionCategory>Category: </LTSAmmunitionCategory>
+    <LTSAmmoCategoryOptions>Options for category</LTSAmmoCategoryOptions>
+    <LTSAnimalAmmo>Animals require ammo</LTSAnimalAmmo>
+    <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
+    <LTSAvailableAmmoCategory>Available ammunition within current category.</LTSAvailableAmmoCategory>
+    <LTSDisableMod>Disable usage For Filtered</LTSDisableMod>
+    <LTSDefaultAssociation>Set Defaults For Filtered</LTSDefaultAssociation>
+    <LTSDisable>Disable All Filtered</LTSDisable>
+    <LTSEnable>Enable All Filtered</LTSEnable>
+    <LTSEnableMod>Enable usage For Filtered</LTSEnableMod>
+    <LTSExemptWeapon>If checked, this weapon requires ammo.</LTSExemptWeapon>
+    <LTSFilter>Filter options</LTSFilter>
+    <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
+    <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
+    <LTSMechanoidAmmo>Mechanoids require ammo</LTSMechanoidAmmo>
+    <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
+    <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
+    <LTSNPCLessAmmo>pawn ammo spawn multiplier: {0}%.</LTSNPCLessAmmo>
+    <LTSPerBullet>Ammo per bullet</LTSPerBullet>
+    <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
+    <LTSUseAmmo>If checked, this weapon can use {0}</LTSUseAmmo>
+    <LTSWeapons>Weapons</LTSWeapons>
 
-
-        <!--Messages-->
-        <LTSNoAmmo>No ammo!</LTSNoAmmo>
-        <LTSNoAmmoDesc>Your colonists lack ammo!</LTSNoAmmoDesc>
-        <LTSUnloadKit>Unload kit</LTSUnloadKit>
-        <LTSOutOfAmmo>{PAWN_nameDef} have run out of {0}!</LTSOutOfAmmo>
-        <LTSDesignatorLootAmmo>Loot ammo</LTSDesignatorLootAmmo>
-        <LTSDesignatorLootAmmoDesc>Loot ammo from corpses and the wounded.</LTSDesignatorLootAmmoDesc>
-        <LTSDesignatorCannotLootAmmo>Can't loot ammo</LTSDesignatorCannotLootAmmo>
-        <LTSMessageMustDesignateLootable>Must designate corpse or downed character with a kit.</LTSMessageMustDesignateLootable>
-    </LanguageData>
+    <!--Messages-->
+    <LTSNoAmmo>No ammo!</LTSNoAmmo>
+    <LTSNoAmmoDesc>Your colonists lack ammo!</LTSNoAmmoDesc>
+    <LTSUnloadKit>Unload kit</LTSUnloadKit>
+    <LTSOutOfAmmo>{PAWN_nameDef} have run out of {0}!</LTSOutOfAmmo>
+    <LTSDesignatorLootAmmo>Loot ammo</LTSDesignatorLootAmmo>
+    <LTSDesignatorLootAmmoDesc>Loot ammo from corpses and the wounded.</LTSDesignatorLootAmmoDesc>
+    <LTSDesignatorCannotLootAmmo>Can't loot ammo</LTSDesignatorCannotLootAmmo>
+    <LTSMessageMustDesignateLootable>Must designate corpse or downed character with a kit.</LTSMessageMustDesignateLootable>
+</LanguageData>

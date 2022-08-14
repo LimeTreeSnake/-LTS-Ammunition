@@ -156,7 +156,23 @@ namespace Ammunition.Logic {
                     if (p.equipment != null && p.equipment.Primary != null) {
                         IEnumerable<AmmoCategoryDef> categories = AmmoCategoryDefs.Where(x => Settings.Settings.CategoryWeaponDictionary.TryGetValue(x.defName, out Dictionary<string, bool> wep) == true && wep.TryGetValue(p.equipment.Primary.def.defName, out bool res) && res);
                         if (categories.Count() > 0) {
-                            ThingDef kit = AvailableKits.RandomElement();
+                            int burstCount = p.equipment.Primary.def.Verbs.FirstOrDefault(x => x.verbClass == typeof(Verb_Shoot)).burstShotCount;
+                            List<ThingDef> sorted = AvailableKits.OrderBy(x => x.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum() * x.GetCompProperties<CompProps_Kit>().bags).ToList();
+                            ThingDef kit = null;
+                            if (Settings.Settings.UseAmmoPerBullet) {
+                                kit = sorted.FirstOrDefault(y => y.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum() / burstCount > 20);
+                            }
+                            else {
+                                for (int i = 0; i < sorted.Count(); i++) {
+                                    if (Rand.Bool) {
+                                        kit = sorted[i];
+                                        break;
+                                    }
+                                }
+                            }
+                            if (kit == null) {
+                                kit = sorted.First();
+                            }
                             if (kit != null) {
                                 app = (Things.Kit)ThingMaker.MakeThing(kit, GenStuff.AllowedStuffsFor(kit, TechLevel.Undefined).RandomElement());
                                 if (app != null) {
@@ -167,7 +183,7 @@ namespace Ammunition.Logic {
                                         app.KitComp.Bags[i].ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
                                         if (app.KitComp.Bags[i].ChosenAmmo != null) {
                                             app.KitComp.Bags[i].MaxCount = app.KitComp.Props.ammoCapacity[i];
-                                            app.KitComp.Bags[i].Count = Rand.Range(app.KitComp.Props.ammoCapacity[i] / 3, app.KitComp.Props.ammoCapacity[i]);
+                                            app.KitComp.Bags[i].Count = (int)(Rand.Range(app.KitComp.Props.ammoCapacity[i] / 3, app.KitComp.Props.ammoCapacity[i]) * Settings.Settings.PawnAmmoSpawnRate);
                                         }
                                         else {
                                             Log.Message("There are somehow no ammo within randomly chosen category.");
@@ -211,7 +227,11 @@ namespace Ammunition.Logic {
                     }
                     foreach (ThingDef weapon in AvailableProjectileWeapons) {
                         if (!dic.ContainsKey(weapon.defName)) {
-                            dic.Add(weapon.defName, category.autoAssignable && !category.excludeWeaponDefs.Contains(weapon.defName) && (category.includeWeaponDefs.Contains(weapon.defName) || TechLevelEqualCategory(weapon.techLevel, category.ammoType)));
+                            bool assigned = (category.includeWeaponDefs.Contains(weapon.defName) || (category.autoAssignable && TechLevelEqualCategory(weapon.techLevel, category.ammoType)));
+                            dic.Add(weapon.defName, assigned && !category.excludeWeaponDefs.Contains(weapon.defName));
+                        }
+                        if (!Settings.Settings.ExemptionWeaponDictionary.ContainsKey(weapon.defName)) {
+                            Settings.Settings.ExemptionWeaponDictionary.Add(weapon.defName, weapon.HasModExtension<DefModExtensions.ExemptAmmoUsageExtension>());
                         }
                     }
                 }
@@ -222,6 +242,7 @@ namespace Ammunition.Logic {
         }
         internal static void ResetInitialize() {
             Settings.Settings.CategoryWeaponDictionary = new Dictionary<string, Dictionary<string, bool>>();
+            Settings.Settings.ExemptionWeaponDictionary = new Dictionary<string, bool>();
             Initialize(false);
         }
         internal static void Save() {
@@ -276,7 +297,9 @@ namespace Ammunition.Logic {
                     return true;
                 if ((pawn.RaceProps.IsMechanoid && !Settings.Settings.UseMechanoidAmmo) || (pawn.RaceProps.Animal && !Settings.Settings.UseAnimalAmmo))
                     return true;
-                Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weapon.def.defName, out bool exempt);
+                if (!Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weapon.def.defName, out bool exempt)) {
+                    return true;
+                }
                 if (exempt)
                     return true;
                 //If all prior fails, this means the weapon needs ammo.

@@ -1,6 +1,14 @@
 ﻿2022-08
     - Make sure mod loaded after LTS Systems
-
+    - Added pawn carried ammo spawn rate multiplier 10%->100%, Default 100%
+        Base code selects a random value between 1/3 of cap -> full ammo cap. The new percentage change is applied after that value is selected.
+    - Added kit selection spawn rules. 
+        If per bullet mod setting selected, will try to select a kit that allows at least 20 bursts, if none applicable, choose largest kit.
+        If per burst mod setting selected. Will go through the sorted list of available kits where smallest is first and randomly try to select an item where first item have the highest chance.
+    - Added a new DefModExtension which allows modders to exclude their weapons from using ammo as a default setting.
+        Usage: add this to mod extensions (MayRequire="LimeTreeSnake.Ammunition" Class="Ammunition.DefModExtensions.ExemptAmmoUsageExtension")
+    - If a weapon does not exist in the mod settings, then it shan't be accounted for by this mod. This should fix issues for people with special modded weapons and armor.
+    
 2022-08-07
     - Unequipped kits drop ammo
     - Fixed melee hunting weapon alert triggered.

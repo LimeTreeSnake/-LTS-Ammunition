@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\v1.3\Assemblies\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>none</ErrorReport>
@@ -65,6 +65,7 @@
     <Compile Include="Alerts\AlertAmmo.cs" />
     <Compile Include="Components\AmmunitionComponent.cs" />
     <Compile Include="Components\KitComponent.cs" />
+    <Compile Include="DefModExtensions\ExemptAmmoUsageExtension.cs" />
     <Compile Include="Defs\AmmoCategoryDef.cs" />
     <Compile Include="Defs\RecordDefs.cs" />
     <Compile Include="Defs\DesignationDefs.cs" />
