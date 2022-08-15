@@ -112,7 +112,7 @@ namespace Ammunition.Logic {
             if (pawn.IsQuestLodger()) {
                 return false;
             }
-            if (GetWornKits(pawn).Where(x => x.KitComp.Bags.Where(y => y.Count > 0).Count() > 0).Count() < 1) {
+            if (pawn.apparel.AnyApparel && GetWornKits(pawn).Where(x => x.KitComp.Bags.Where(y => y.Count > 0).Count() > 0).Count() < 1) {
                 return false;
             }
             if (pawn.Downed || pawn.Dead) {
