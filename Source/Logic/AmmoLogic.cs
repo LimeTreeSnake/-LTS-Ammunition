@@ -7,7 +7,7 @@ using Ammunition.Defs;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Ammunition.Components;
-using UnityEngine;
+using Ammunition.DefModExtensions;
 
 namespace Ammunition.Logic {
 
@@ -21,7 +21,7 @@ namespace Ammunition.Logic {
         /// <summary>
         /// Returns all thingdefs with an ammunition component.
         /// </summary>
-        public static IEnumerable<ThingDef> AvailableAmmo = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.HasComp(typeof(Components.AmmunitionComponent)));
+        public static IEnumerable<ThingDef> AvailableAmmo = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.HasModExtension<AmmunitionExtension>());
         /// <summary>
         /// Returns all thingdefs with a kit component.
         /// </summary>
@@ -235,6 +235,7 @@ namespace Ammunition.Logic {
                         }
                     }
                 }
+                Settings.Settings.GetAmmoFromString();
             }
             catch (Exception ex) {
                 Log.Error("Error initializing Ammunition Framework: " + ex.Message);

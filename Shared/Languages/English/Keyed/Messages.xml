@@ -23,6 +23,7 @@
     <LTSNPCLessAmmo>pawn ammo spawn multiplier: {0}%.</LTSNPCLessAmmo>
     <LTSPerBullet>Ammo per bullet</LTSPerBullet>
     <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
+    <LTSSelectedStandardAmmo>Default</LTSSelectedStandardAmmo>
     <LTSUseAmmo>If checked, this weapon can use {0}</LTSUseAmmo>
     <LTSWeapons>Weapons</LTSWeapons>
 

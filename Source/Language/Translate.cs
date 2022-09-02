@@ -26,6 +26,7 @@ namespace Ammunition.Language {
         public static string NPCLessAmmo(int percentage) => "LTSNPCLessAmmo".Translate(percentage);
         public static string PerBullet => "LTSPerBullet".Translate();
         public static string PerBulletDesc => "LTSPerBulletDesc".Translate();
+        public static string SelectedStandardAmmo => "LTSSelectedStandardAmmo".Translate();
         public static string UseAmmo(string cat) => "LTSUseAmmo".Translate(cat);
         public static string Weapons => "LTSWeapons".Translate();
 

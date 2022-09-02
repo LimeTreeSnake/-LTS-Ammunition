@@ -4,6 +4,7 @@ using Verse;
 using System.Linq;
 using Ammunition.Logic;
 using Ammunition.Models;
+using Ammunition.DefModExtensions;
 
 namespace Ammunition.Components {
     public class KitComponent : ThingComp {
@@ -22,7 +23,7 @@ namespace Ammunition.Components {
             get => lastUsedAmmo;
             set => lastUsedAmmo = value;
         }
-        public ThingDef LastUsedBullet => LastUsedAmmo?.GetCompProperties<CompProps_Ammunition>()?.bulletDef;
+        public ThingDef LastUsedBullet => LastUsedAmmo?.GetModExtension<AmmunitionExtension>()?.bulletDef;
         #endregion Properties
         public override void Initialize(CompProperties props) {
             base.Initialize(props);
@@ -32,10 +33,10 @@ namespace Ammunition.Components {
             }
             for (int i = 0; i < compProps_Kit.bags; i++) {
                 Bag bag = new Bag {
-                    ChosenAmmo = AmmoLogic.AvailableAmmo?.FirstOrDefault(),
+                    ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
                     Count = 0,
-                    MaxCount = compProps_Kit.ammoCapacity[i],
                     Capacity = compProps_Kit.ammoCapacity[i],
+                    MaxCount = compProps_Kit.ammoCapacity[i],
                     Use = true
                 };
                 bags.Add(bag);
@@ -45,6 +46,7 @@ namespace Ammunition.Components {
             base.PostExposeData();
             Scribe_Collections.Look(ref bags, "Bags", LookMode.Deep);
         }
+
         public override void Notify_Unequipped(Pawn pawn) {
             base.Notify_Unequipped(pawn);
             if (pawn.Spawned) {

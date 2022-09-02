@@ -1,4 +1,11 @@
-﻿2022-08
+﻿2022-09-02
+    - Base stack limit for ammunition 75->100
+    - Slight adjustment to mod settings, hopefully fixes some issues with disappearing weapons list.
+    - Able to select default ammo for kits in mod settings. Just click on the ammo
+    - Kits now have capacity set to max when created.
+    - Removed ammo component, introduced ammodefextension instead. 
+
+2022-09-01
     - Make sure mod loaded after LTS Systems
     - Added pawn carried ammo spawn rate multiplier 10%->100%, Default 100%
         Base code selects a random value between 1/3 of cap -> full ammo cap. The new percentage change is applied after that value is selected.
