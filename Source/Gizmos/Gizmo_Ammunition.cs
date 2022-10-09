@@ -26,7 +26,7 @@ namespace Ammunition.Gizmos {
         }
         public Gizmo_Ammunition(ref KitComponent comp) {
             kitComp = comp;
-            this.order = -50f;
+            this.Order = -50f;
         }
 
         public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms) {

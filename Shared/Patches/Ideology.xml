@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Patch>
+    <Operation Class="PatchOperationSequence">
+        <operations>
+            <!-- Techist -->
+            <li Class="PatchOperationAdd">
+                <success>Always</success>
+                <xpath>Defs/StyleCategoryDef[defName = "Techist"]/thingDefStyles</xpath>
+                <value>
+                    <li>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <styleDef>Techist_SmallKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitMedium</thingDef>
+                        <styleDef>Techist_MediumKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitLarge</thingDef>
+                        <styleDef>Techist_LargeKit</styleDef>
+                    </li>
+                </value>
+            </li>
+            <!-- Rustic -->
+            <li Class="PatchOperationAdd">
+                <success>Always</success>
+                <xpath>Defs/StyleCategoryDef[defName = "Rustic"]/thingDefStyles</xpath>
+                <value>
+                    <li>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <styleDef>Rustic_SmallKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitMedium</thingDef>
+                        <styleDef>Rustic_MediumKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitLarge</thingDef>
+                        <styleDef>Rustic_LargeKit</styleDef>
+                    </li>
+                </value>
+            </li>
+            <!-- Animalist -->
+            <li Class="PatchOperationAdd">
+                <success>Always</success>
+                <xpath>Defs/StyleCategoryDef[defName = "Animalist"]/thingDefStyles</xpath>
+                <value>
+                    <li>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <styleDef>Animalist_SmallKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitMedium</thingDef>
+                        <styleDef>Animalist_MediumKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitLarge</thingDef>
+                        <styleDef>Animalist_LargeKit</styleDef>
+                    </li>
+                </value>
+            </li>
+            <!-- Spikecore -->
+            <li Class="PatchOperationAdd">
+                <success>Always</success>
+                <xpath>Defs/StyleCategoryDef[defName = "Spikecore"]/thingDefStyles</xpath>
+                <value>
+                    <li>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <styleDef>Spikecore_SmallKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitMedium</thingDef>
+                        <styleDef>Spikecore_MediumKit</styleDef>
+                    </li>
+                    <li>
+                        <thingDef>LTS_KitLarge</thingDef>
+                        <styleDef>Spikecore_LargeKit</styleDef>
+                    </li>
+                </value>
+            </li>
+        </operations>
+    </Operation>
+</Patch>

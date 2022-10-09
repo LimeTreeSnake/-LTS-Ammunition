@@ -1,53 +1,53 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 
-    <Patch>
-        <Operation Class="PatchOperationSequence">
-            <operations>
-                <li Class="PatchOperationInsert">
+<Patch>
+    <Operation Class="PatchOperationSequence">
+        <operations>
+            <!-- <li Class="PatchOperationInsert">
                     <xpath>/Defs/DesignationCategoryDef[defName = "Orders"]/specialDesignatorClasses/li[text()="Designator_Strip"]</xpath>
                     <value>
                         <li>Ammunition.Designators.Designator_LootAmmo</li>
                     </value>
-                </li>
-                <li Class="PatchOperationAdd">
-                    <xpath>/Defs/ScenarioDef[defName = "Crashlanded"]/scenario/parts</xpath>
-                    <value>
-                        <li Class="ScenPart_StartingThing_Defined">
-                            <def>StartingThing_Defined</def>
-                            <thingDef>LTS_KitSmall</thingDef>
-                            <stuff>Cloth</stuff>
-                            <count>2</count>
-                        </li>
-                        <li Class="ScenPart_StartingThing_Defined">
-                            <def>StartingThing_Defined</def>
-                            <thingDef>LTS_KitMedium</thingDef>
-                            <stuff>Cloth</stuff>
-                            <count>1</count>
-                        </li>
-                    </value>
-                </li>
-                <li Class="PatchOperationAdd">
-                    <xpath>/Defs/ScenarioDef[defName = "LostTribe"]/scenario/parts</xpath>
-                    <value>
-                        <li Class="ScenPart_StartingThing_Defined">
-                            <def>StartingThing_Defined</def>
-                            <thingDef>LTS_KitSmall</thingDef>
-                            <stuff>Cloth</stuff>
-                            <count>2</count>
-                        </li>
-                    </value>
-                </li>
-                <li Class="PatchOperationAdd">
-                    <xpath>/Defs/ScenarioDef[defName = "TheRichExplorer"]/scenario/parts</xpath>
-                    <value>
-                        <li Class="ScenPart_StartingThing_Defined">
-                            <def>StartingThing_Defined</def>
-                            <thingDef>LTS_KitLarge</thingDef>
-                            <stuff>Cloth</stuff>
-                            <count>1</count>
-                        </li>
-                    </value>
-                </li>
-            </operations>
-        </Operation>
-    </Patch>
+                </li> -->
+            <li Class="PatchOperationAdd">
+                <xpath>/Defs/ScenarioDef[defName = "Crashlanded"]/scenario/parts</xpath>
+                <value>
+                    <li Class="ScenPart_StartingThing_Defined">
+                        <def>StartingThing_Defined</def>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <stuff>Cloth</stuff>
+                        <count>2</count>
+                    </li>
+                    <li Class="ScenPart_StartingThing_Defined">
+                        <def>StartingThing_Defined</def>
+                        <thingDef>LTS_KitMedium</thingDef>
+                        <stuff>Cloth</stuff>
+                        <count>1</count>
+                    </li>
+                </value>
+            </li>
+            <li Class="PatchOperationAdd">
+                <xpath>/Defs/ScenarioDef[defName = "LostTribe"]/scenario/parts</xpath>
+                <value>
+                    <li Class="ScenPart_StartingThing_Defined">
+                        <def>StartingThing_Defined</def>
+                        <thingDef>LTS_KitSmall</thingDef>
+                        <stuff>Cloth</stuff>
+                        <count>2</count>
+                    </li>
+                </value>
+            </li>
+            <li Class="PatchOperationAdd">
+                <xpath>/Defs/ScenarioDef[defName = "TheRichExplorer"]/scenario/parts</xpath>
+                <value>
+                    <li Class="ScenPart_StartingThing_Defined">
+                        <def>StartingThing_Defined</def>
+                        <thingDef>LTS_KitLarge</thingDef>
+                        <stuff>Cloth</stuff>
+                        <count>1</count>
+                    </li>
+                </value>
+            </li>
+        </operations>
+    </Operation>
+</Patch>

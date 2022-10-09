@@ -50,7 +50,12 @@ namespace Ammunition.Components {
         public override void Notify_Unequipped(Pawn pawn) {
             base.Notify_Unequipped(pawn);
             if (pawn.Spawned) {
-                Unload(pawn.PositionHeld);
+                //if (pawn.RaceProps.IsMechanoid) {
+
+                //}
+                //else {
+                    Unload(pawn.PositionHeld);
+                //}
             }
         }
         public void Unload(IntVec3 pos) {

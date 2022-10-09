@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <WorkGiverDef>
+        <defName>DoBillsAmmunitionBench</defName>
+        <label>make ammo</label>
+        <giverClass>WorkGiver_DoBill</giverClass>
+        <workType>Crafting</workType>
+        <priorityInType>105</priorityInType>
+        <fixedBillGiverDefs>
+            <li>LTS_AmmunitionBench</li>
+        </fixedBillGiverDefs>
+        <verb>work</verb>
+        <gerund>working at</gerund>
+        <requiredCapacities>
+            <li>Manipulation</li>
+        </requiredCapacities>
+        <prioritizeSustains>true</prioritizeSustains>
+    </WorkGiverDef>
+    <WorkGiverDef>
+        <defName>LTS_DoLoadKit</defName>
+        <label>load kit</label>
+        <giverClass>Ammunition.WorkGivers.WorkGiver_LoadKit</giverClass>
+        <workType>BasicWorker</workType>
+        <priorityInType>88</priorityInType>
+        <canBeDoneWhileDrafted>true</canBeDoneWhileDrafted>
+        <verb>load kit</verb>
+        <gerund>loading kit</gerund>
+        <requiredCapacities>
+            <li>Manipulation</li>
+        </requiredCapacities>
+    </WorkGiverDef>
+    <WorkGiverDef>
+        <defName>LTS_DoStrip</defName>
+        <label>loot ammo</label>
+        <giverClass>Ammunition.WorkGivers.WorkGiver_LootAmmo</giverClass>
+        <workType>Hauling</workType>
+        <priorityInType>101</priorityInType>
+        <canBeDoneWhileDrafted>true</canBeDoneWhileDrafted>
+        <verb>pilfer</verb>
+        <gerund>pilfering</gerund>
+        <requiredCapacities>
+            <li>Manipulation</li>
+        </requiredCapacities>
+    </WorkGiverDef>
+</Defs>

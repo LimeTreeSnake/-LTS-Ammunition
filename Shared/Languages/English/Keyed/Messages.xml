@@ -2,25 +2,23 @@
 <LanguageData>
     <!--Mod Settings-->
     <LTSAmmunition>Ammunition</LTSAmmunition>
-    <LTSAmmunitionDefault>Default</LTSAmmunitionDefault>
     <LTSAmmunitionCategory>Category: </LTSAmmunitionCategory>
-    <LTSAmmoCategoryOptions>Options for category</LTSAmmoCategoryOptions>
     <LTSAnimalAmmo>Animals require ammo</LTSAnimalAmmo>
     <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
-    <LTSAvailableAmmoCategory>Available ammunition within current category.</LTSAvailableAmmoCategory>
+    <LTSAvailableAmmoCategory>Ammunition in category.</LTSAvailableAmmoCategory>
     <LTSDisableMod>Disable usage For Filtered</LTSDisableMod>
     <LTSDefaultAssociation>Set Defaults For Filtered</LTSDefaultAssociation>
     <LTSDisable>Disable All Filtered</LTSDisable>
     <LTSEnable>Enable All Filtered</LTSEnable>
     <LTSEnableMod>Enable usage For Filtered</LTSEnableMod>
     <LTSExemptWeapon>If checked, this weapon requires ammo.</LTSExemptWeapon>
-    <LTSFilter>Filter options</LTSFilter>
     <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
     <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
     <LTSMechanoidAmmo>Mechanoids require ammo</LTSMechanoidAmmo>
     <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
     <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
     <LTSNPCLessAmmo>pawn ammo spawn multiplier: {0}%.</LTSNPCLessAmmo>
+    <LTSNPCLessAmmoDesc>The percentage amount to reduce after having assigned and given ammo to a newly spawned pawn.</LTSNPCLessAmmoDesc>
     <LTSPerBullet>Ammo per bullet</LTSPerBullet>
     <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
     <LTSSelectedStandardAmmo>Default</LTSSelectedStandardAmmo>

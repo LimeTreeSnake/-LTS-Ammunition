@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <!-- Techist -->
+    <ThingStyleDef Name="Techist_SmallKit">
+        <defName>Techist_SmallKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Small_Techist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Techist_MediumKit">
+        <defName>Techist_MediumKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Medium_Techist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Techist_LargeKit">
+        <defName>Techist_LargeKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Large_Techist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <!-- Rustic -->
+    <ThingStyleDef Name="Rustic_SmallKit">
+        <defName>Rustic_SmallKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Small_Rustic</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Rustic_MediumKit">
+        <defName>Rustic_MediumKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Medium_Rustic</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Rustic_LargeKit">
+        <defName>Rustic_LargeKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Large_Rustic</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <!-- Animalist -->
+    <ThingStyleDef Name="Animalist_SmallKit">
+        <defName>Animalist_SmallKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Small_Animalist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Animalist_MediumKit">
+        <defName>Animalist_MediumKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Medium_Animalist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Animalist_LargeKit">
+        <defName>Animalist_LargeKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Large_Animalist</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <!-- Spikecore -->
+    <ThingStyleDef Name="Spikecore_SmallKit">
+        <defName>Spikecore_SmallKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Small_Spikecore</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Spikecore_MediumKit">
+        <defName>Spikecore_MediumKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Medium_Spikecore</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+    <ThingStyleDef Name="Spikecore_LargeKit">
+        <defName>Spikecore_LargeKit</defName>
+        <graphicData>
+            <texPath>Kits/Kit_Large_Spikecore</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+    </ThingStyleDef>
+</Defs>
