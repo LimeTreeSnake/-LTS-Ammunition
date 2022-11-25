@@ -5,6 +5,7 @@ using System.Linq;
 using Ammunition.Logic;
 using Ammunition.Models;
 using Ammunition.DefModExtensions;
+using Ammunition.Defs;
 
 namespace Ammunition.Components {
     public class KitComponent : ThingComp {
@@ -27,19 +28,36 @@ namespace Ammunition.Components {
         #endregion Properties
         public override void Initialize(CompProperties props) {
             base.Initialize(props);
-            CompProps_Kit compProps_Kit = props as CompProps_Kit;
+            InitializeBags();
+        }
+        public void InitializeBags() {
             if (bags == null) {
                 bags = new List<Bag>();
             }
-            for (int i = 0; i < compProps_Kit.bags; i++) {
-                Bag bag = new Bag {
-                    ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
-                    Count = 0,
-                    Capacity = compProps_Kit.ammoCapacity[i],
-                    MaxCount = compProps_Kit.ammoCapacity[i],
-                    Use = true
-                };
-                bags.Add(bag);
+            if (Settings.Settings.BagSettingsDictionary.TryGetValue(parent.def.defName, out List<int> bagSettings)) {
+                for (int i = 0; i < bagSettings.Count; i++) {
+                    Bag bag = new Bag {
+                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
+                        Count = 0,
+                        Capacity = bagSettings[i],
+                        MaxCount = bagSettings[i],
+                        Use = true
+                    };
+                    bags.Add(bag);
+                }
+            }
+            else {
+                CompProps_Kit compProps_Kit = props as CompProps_Kit;
+                for (int i = 0; i < compProps_Kit.ammoCapacity.Count; i++) {
+                    Bag bag = new Bag {
+                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
+                        Count = 0,
+                        Capacity = compProps_Kit.ammoCapacity[i],
+                        MaxCount = compProps_Kit.ammoCapacity[i],
+                        Use = true
+                    };
+                    bags.Add(bag);
+                }
             }
         }
         public override void PostExposeData() {
@@ -50,12 +68,36 @@ namespace Ammunition.Components {
         public override void Notify_Unequipped(Pawn pawn) {
             base.Notify_Unequipped(pawn);
             if (pawn.Spawned) {
-                //if (pawn.RaceProps.IsMechanoid) {
+                Unload(pawn.PositionHeld);
+            }
+        }
+        public override void Notify_Equipped(Pawn pawn) {
+            base.Notify_Equipped(pawn);
+            if (pawn.Spawned && pawn.equipment?.Primary != null) {
+                if (AmmoLogic.IsExempt(pawn.equipment.Primary.def.defName)) {
+                    return;
+                }
+                else {
+                    if (Settings.Settings.InitialAmmoType != null && AmmoLogic.WeaponDefCanUseAmmoDef(pawn.equipment.Primary.def.defName, Settings.Settings.InitialAmmoType.defName)) {
+                        for (int i = 0; i < bags.Count; i++) {
+                            bags[i].ChosenAmmo = Settings.Settings.InitialAmmoType;
+                        }
+                    }
+                    else {
+                        ThingDef ammoDef = null;
+                        List<AmmoCategoryDef> ammoCategories = AmmoLogic.AvailableAmmoForWeapon(pawn.equipment.Primary.def.defName);
+                        if (ammoCategories != null && ammoCategories.Any()) {
+                            string ammoDefName = ammoCategories.RandomElement().ammoDefs.RandomElement();
+                            ammoDef = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
+                            if (ammoDef != null) {
+                                for (int i = 0; i < bags.Count; i++) {
+                                    bags[i].ChosenAmmo = ammoDef;
+                                }
+                            }
+                        }
 
-                //}
-                //else {
-                    Unload(pawn.PositionHeld);
-                //}
+                    }
+                }
             }
         }
         public void Unload(IntVec3 pos) {
@@ -70,7 +112,6 @@ namespace Ammunition.Components {
 
     public class CompProps_Kit : CompProperties {
         public List<int> ammoCapacity;
-        public int bags;
         public CompProps_Kit() {
             compClass = typeof(KitComponent);
         }

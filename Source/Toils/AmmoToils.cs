@@ -13,7 +13,7 @@ namespace Ammunition.Toils {
                 toil.initAction = delegate {
                     Pawn actor = toil.actor;
                     Thing thing = actor.CurJob.GetTarget(ind).Thing;
-                    for (int i = 0; i < kit.Props.bags; i++) {
+                    for (int i = 0; i < kit.Bags.Count; i++) {
                         if (kit.Bags[i].ChosenAmmo == thing.def) {
                             int amount = Mathf.Min(thing.stackCount, kit.Bags[i].MaxCount - kit.Bags[i].Count);
                             if (amount > 0) {
@@ -50,7 +50,7 @@ namespace Ammunition.Toils {
                         if (!actor.CanReserve(t)) {
                             return false;
                         }
-                        for (int i = 0; i < kit.Props.bags; i++) {
+                        for (int i = 0; i < kit.Bags.Count; i++) {
                             if (def == kit.Bags[i].ChosenAmmo && kit.Bags[i].Count < kit.Bags[i].MaxCount) {
                                 return true;
                             }

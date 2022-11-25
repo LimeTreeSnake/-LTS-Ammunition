@@ -27,12 +27,6 @@ namespace Ammunition.Harmony {
             harmony.Patch(typeof(PawnGenerator).GetMethods().FirstOrDefault(x => x.Name == "GeneratePawn" && x.GetParameters().Count() == 1), null, new HarmonyMethod(typeof(Harmony).GetMethod("GeneratePawn_PostFix")));
             //harmony.Patch(AccessTools.Method(typeof(ReverseDesignatorDatabase), "InitDesignators"), null, new HarmonyMethod(typeof(Harmony).GetMethod("InitDesignators_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"), null, new HarmonyMethod(typeof(Harmony).GetMethod("AddHumanlikeOrders_PostFix")));
-
-
-            Type t = AccessTools.TypeByName("aRandomKiwi.MFM.Utils");
-            if (t != null) {
-                harmony.Patch(AccessTools.Method(t, "processMercWeapon"), null, new HarmonyMethod(typeof(Harmony).GetMethod("processMercWeapon_PostFix")));
-            }
             Logic.AmmoLogic.Initialize();
 
         }
@@ -71,11 +65,6 @@ namespace Ammunition.Harmony {
         public static void RedressPawn_PostFix(ref Pawn pawn) {
             if (pawn != null && pawn.apparel != null) {
                 Logic.AmmoLogic.EquipPawn(pawn);
-            }
-        }
-        public static void ProcessMercWeapon_PostFix(ref Pawn p) {
-            if (p != null && p.apparel != null) {
-                Logic.AmmoLogic.EquipPawn(p);
             }
         }
         public static void InitDesignators_PostFix(ref List<Designator> ___desList) {

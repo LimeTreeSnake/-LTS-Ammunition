@@ -51,13 +51,15 @@
             <EquipDelay>2</EquipDelay>
         </statBases>
         <costStuffCount>20</costStuffCount>
+        <apparel>
+            <developmentalStageFilter>14</developmentalStageFilter>
+        </apparel>
         <comps>
             <li Class="Ammunition.Components.CompProps_Kit">
                 <ammoCapacity>
                     <li>30</li>
                     <li>30</li>
                 </ammoCapacity>
-                <bags>2</bags>
             </li>
         </comps>
     </ThingDef>
@@ -84,7 +86,6 @@
                     <li>60</li>
                     <li>60</li>
                 </ammoCapacity>
-                <bags>2</bags>
             </li>
         </comps>
     </ThingDef>
@@ -113,7 +114,6 @@
                     <li>60</li>
                     <li>60</li>
                 </ammoCapacity>
-                <bags>4</bags>
             </li>
         </comps>
     </ThingDef>

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using RimWorld;
+using Ammunition.Things;
+using Ammunition.Components;
+using System.Security.Cryptography;
 
 namespace Ammunition.Settings {
     public class AmmunitionSettings : Mod {
@@ -37,11 +40,14 @@ namespace Ammunition.Settings {
         private static bool hideMultipleGizmos = true;
         private static float pawnAmmoSpawnRate = 1f;
         private static bool useAmmoPerBullet = false;
-        private static bool useAnimalAmmo = true;
-        private static bool useMechanoidAmmo = true;
+        private static bool useAnimalAmmo = false;
+        private static bool useMechanoidAmmo = false;
+        private static bool useSingleLineAmmo = false;
+        private static bool useWiderGizmo = false;
         private static string initialAmmoString;
         private static ThingDef initialAmmoType;
         private static AmmoCategoryDef chosenCategory = null;
+        private static ThingDef chosenKit = null;
         private static bool enable, disable, enableMod, disableMod, changesMade;
         private static bool
         Neolithic = true,
@@ -64,16 +70,21 @@ namespace Ammunition.Settings {
         public static bool UseAmmoPerBullet => useAmmoPerBullet;
         public static bool UseAnimalAmmo => useAnimalAmmo;
         public static bool UseMechanoidAmmo => useMechanoidAmmo;
+        public static bool UseSingleLineAmmo => useSingleLineAmmo;
+        public static bool UseWiderGizmo => useWiderGizmo;
         public static ThingDef InitialAmmoType => initialAmmoType;
         public static Dictionary<string, Dictionary<string, bool>> CategoryWeaponDictionary;
         public static Dictionary<string, bool> ExemptionWeaponDictionary;
+        public static Dictionary<string, List<int>> BagSettingsDictionary;
 
         public override void ExposeData() {
             Scribe_Values.Look(ref disableAmmoUsage, "DisableAmmoUsage", false, false);
             Scribe_Values.Look(ref hideMultipleGizmos, "HideMultipleGizmos", true, false);
             Scribe_Values.Look(ref pawnAmmoSpawnRate, "PawnAmmoSpawnRate", 1f, false);
-            Scribe_Values.Look(ref useAmmoPerBullet, "UseAmmoPerBullet", false, false);
+            Scribe_Values.Look(ref useAmmoPerBullet, "UseAmmoPerBullet", true, false);
             Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
+            Scribe_Values.Look(ref useSingleLineAmmo, "UseSingleLineAmmo", false, false);
+            Scribe_Values.Look(ref useWiderGizmo, "UseWiderGizmo", false, false);
             Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
             Scribe_Values.Look(ref initialAmmoString, "InitialAmmoString", "");
             base.ExposeData();
@@ -85,6 +96,9 @@ namespace Ammunition.Settings {
             }
             if (ExemptionWeaponDictionary == null) {
                 ExemptionWeaponDictionary = new Dictionary<string, bool>();
+            }
+            if (BagSettingsDictionary == null) {
+                BagSettingsDictionary = new Dictionary<string, List<int>>();
             }
         }
         public static ThingDef GetAmmoFromString() {
@@ -101,8 +115,10 @@ namespace Ammunition.Settings {
             disableAmmoUsage = false;
             hideMultipleGizmos = true;
             useAmmoPerBullet = false;
-            useAnimalAmmo = true;
-            useMechanoidAmmo = true;
+            useAnimalAmmo = false;
+            useMechanoidAmmo = false;
+            useSingleLineAmmo = false;
+            useWiderGizmo = false;
             pawnAmmoSpawnRate = 1f;
             initialAmmoType = AmmoLogic.AvailableAmmo?.FirstOrDefault();
             initialAmmoString = initialAmmoType.defName;
@@ -151,11 +167,64 @@ namespace Ammunition.Settings {
                     TooltipHandler.TipRegion(rect4, Translate.AnimalAmmoDesc);
 
                     Rect rect5 = list.GetRect(lineHeight);
+                    Widgets.CheckboxLabeled(rect5, Translate.LTSUseSingleLineAmmo, ref useSingleLineAmmo);
+                    if (Mouse.IsOver(rect5)) {
+                        Widgets.DrawHighlight(rect5);
+                    }
+                    TooltipHandler.TipRegion(rect5, Translate.LTSUseSingleLineAmmoDesc);
+
                     Rect rect6 = list.GetRect(lineHeight);
-                    Widgets.Label(rect5, Translate.NPCLessAmmo((int)(pawnAmmoSpawnRate * 100)));
-                    TooltipHandler.TipRegion(rect5, Translate.AnimalAmmoDesc);
-                    pawnAmmoSpawnRate = Widgets.HorizontalSlider(rect6.ContractedBy(margin), pawnAmmoSpawnRate, 0.1f, 1f);
+                    Widgets.CheckboxLabeled(rect6, Translate.LTSUseWiderGizmo, ref useWiderGizmo);
+                    if (Mouse.IsOver(rect6)) {
+                        Widgets.DrawHighlight(rect6);
+                    }
+                    TooltipHandler.TipRegion(rect6, Translate.LTSUseWiderGizmoDesc);
+
+
+                    Rect rect7 = list.GetRect(lineHeight);
+                    Rect rect8 = list.GetRect(lineHeight);
+                    Widgets.Label(rect7, Translate.NPCLessAmmo((int)(pawnAmmoSpawnRate * 100)));
+                    TooltipHandler.TipRegion(rect7, Translate.AnimalAmmoDesc);
+                    pawnAmmoSpawnRate = Widgets.HorizontalSlider(rect8.ContractedBy(margin), pawnAmmoSpawnRate, 0.1f, 1f);
+
+                    list.GapLine(2);
+                    // Kit settings
+                    if (chosenKit == null) {
+                        chosenKit = AmmoLogic.AvailableKits.First();
+                    }
+                    if (BagSettingsDictionary.TryGetValue(chosenKit.defName, out List<int> bags)) {
+                        Widgets.Label(list.GetRect(lineHeight), Translate.AvailableKits);
+                        //Add image right half
+                        Widgets.Label(list.GetRect(lineHeight), Translate.ChangeBagDesc);
+                        Rect KitDropDown = list.GetRect(lineHeight);
+                        Widgets.Dropdown(KitDropDown.LeftHalf().LeftHalf(), chosenKit, (ThingDef selectedThing) => _ = selectedThing, GenerateKitCategoryMenu, Translate.AmmunitionCategory + chosenKit?.label);
+                        if (Widgets.ButtonText(KitDropDown.LeftHalf().RightHalf(), Translate.AddBag)) {
+                            CompProps_Kit kitProp = chosenKit.comps.FirstOrDefault(x => x is CompProps_Kit) as CompProps_Kit;
+                            if (kitProp != null) {
+                                bags.Add(kitProp.ammoCapacity.First());
+                                changesMade = true;
+                            }
+                        };
+                        list.Gap(2);
+                        for (int i = 0; i < bags.Count; i++) {
+                            int val = bags[i];
+                            string buffer = val.ToString();
+                            Rect KitRect = list.GetRect(lineHeight).LeftHalf();
+                            Rect leftPart = KitRect.LeftPartPixels(KitRect.width - 24);
+                            Rect rightPart = KitRect.RightPartPixels(24);
+                            Widgets.TextFieldNumericLabeled(leftPart, Translate.BagNumber(i + 1), ref val, ref buffer, 1, 999);
+                            if (val != bags[i]) {
+                                changesMade = true;
+                                bags[i] = val;
+                            }
+                            if (Widgets.ButtonImage(rightPart, Widgets.CheckboxOffTex, true) && bags.Count > 1) {
+                                bags.RemoveAt(i);
+                                changesMade = true;
+                            }
+                        }
+                    }
                 }
+                //Second page
                 else {
                     if (AmmoLogic.AmmoCategoryDefs.Count() > 0) {
                         if (chosenCategory == null) {
@@ -322,14 +391,14 @@ namespace Ammunition.Settings {
                         enable = false;
                         disableMod = false;
                         enableMod = false;
-                        if (changesMade) {
-                            Logic.AmmoLogic.Save();
-                            changesMade = false;
-                        }
                     }
                     else {
                         list.Label(Translate.NoAmmoCategories);
                     }
+                }
+                if (changesMade) {
+                    AmmoLogic.Save();
+                    changesMade = false;
                 }
                 list.End();
                 Write();
@@ -345,6 +414,17 @@ namespace Ammunition.Settings {
                 yield return new Widgets.DropdownMenuElement<AmmoCategoryDef> {
                     option = new FloatMenuOption(ammo.label, delegate () { chosenCategory = ammo; }, MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
                     payload = ammo,
+                };
+            }
+            yield break;
+        }
+        public static IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateKitCategoryMenu(ThingDef def) {
+            List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableKits.ToList().GetEnumerator();
+            while (enumerator.MoveNext()) {
+                ThingDef kit = enumerator.Current;
+                yield return new Widgets.DropdownMenuElement<ThingDef> {
+                    option = new FloatMenuOption(kit.label, delegate () { chosenKit = kit; }, MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
+                    payload = kit,
                 };
             }
             yield break;

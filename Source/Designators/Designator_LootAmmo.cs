@@ -23,7 +23,7 @@ namespace Ammunition.Designators {
             soundSucceeded = SoundDefOf.Designate_Claim;
         }
         public override AcceptanceReport CanDesignateThing(Thing t) {
-            if (Map.designationManager.DesignationOn(t, Designation) != null) {
+            if (t == null || Map.designationManager.DesignationOn(t, Designation) != null) {
                 return false;
             }
             return Logic.AmmoLogic.CanBeLootedByColony(t);

@@ -6,6 +6,10 @@
     <LTSAnimalAmmo>Animals require ammo</LTSAnimalAmmo>
     <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
     <LTSAvailableAmmoCategory>Ammunition in category.</LTSAvailableAmmoCategory>
+    <LTSAvailableKits>Available kits.</LTSAvailableKits>
+    <LTSAddBag>Add a bag to this kit.</LTSAddBag>
+    <LTSChangeBagDesc>Notice: Only newly spawned kits will use these settings.</LTSChangeBagDesc>
+    <LTSBagNumber>Bag number {0} ammo capacity - </LTSBagNumber>
     <LTSDisableMod>Disable usage For Filtered</LTSDisableMod>
     <LTSDefaultAssociation>Set Defaults For Filtered</LTSDefaultAssociation>
     <LTSDisable>Disable All Filtered</LTSDisable>
@@ -16,6 +20,10 @@
     <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
     <LTSMechanoidAmmo>Mechanoids require ammo</LTSMechanoidAmmo>
     <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
+    <LTSUseWiderGizmo>Wider ammo gizmo</LTSUseWiderGizmo>
+    <LTSUseWiderGizmoDesc>Whether to use the slightly wider gizmo (true) or the standard vanilla gizmo size (false)</LTSUseWiderGizmoDesc>
+    <LTSUseSingleLineAmmo>One per column gizmo</LTSUseSingleLineAmmo>
+    <LTSUseSingleLineAmmoDesc>Whether ammunition gizmo fills the entire gizmo(true) or is split in two rows to save space(false)</LTSUseSingleLineAmmoDesc>
     <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
     <LTSNPCLessAmmo>pawn ammo spawn multiplier: {0}%.</LTSNPCLessAmmo>
     <LTSNPCLessAmmoDesc>The percentage amount to reduce after having assigned and given ammo to a newly spawned pawn.</LTSNPCLessAmmoDesc>
@@ -26,6 +34,8 @@
     <LTSWeapons>Weapons</LTSWeapons>
 
     <!--Messages-->
+    <LTSDropAll>Drop all</LTSDropAll>
+    <LTSCanUse>Allow usage</LTSCanUse>
     <LTSNoAmmo>No ammo!</LTSNoAmmo>
     <LTSNoAmmoDesc>Your colonists lack ammo!</LTSNoAmmoDesc>
     <LTSUnloadKit>Unload kit</LTSUnloadKit>

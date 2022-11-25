@@ -11,5 +11,6 @@ namespace Ammunition.Logic
     {
         public Dictionary<string, Dictionary<string, bool>> Categories;
         public Dictionary<string, bool> Exemptions;
+        public Dictionary<string, List<int>>  Bags;
     }
 }

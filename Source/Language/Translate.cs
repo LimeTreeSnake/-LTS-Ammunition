@@ -14,6 +14,8 @@ namespace Ammunition.Language {
         public static string DesignatorCannotLootAmmo => "LTSDesignatorCannotLootAmmo".Translate();
         public static string MessageMustDesignateLootable => "LTSMessageMustDesignateLootable".Translate();
         public static string NoAmmo => "LTSNoAmmo".Translate();
+        public static string DropAll => "LTSDropAll".Translate();
+        public static string CanUse => "LTSCanUse".Translate();
         public static string NoAmmoDesc => "LTSNoAmmoDesc".Translate();
         public static string OutOfAmmo(Pawn pawn, string ammo) => "LTSOutOfAmmo".Translate(ammo, pawn.Named("PAWN"));
         public static string UnloadKit => "LTSUnloadKit".Translate();
@@ -24,6 +26,10 @@ namespace Ammunition.Language {
         public static string AnimalAmmo => "LTSAnimalAmmo".Translate();
         public static string AnimalAmmoDesc => "LTSAnimalAmmoDesc".Translate();
         public static string AvailableAmmoCategory => "LTSAvailableAmmoCategory".Translate();
+        public static string AvailableKits => "LTSAvailableKits".Translate();
+        public static string BagNumber(int x) => "LTSBagNumber".Translate(x);
+        public static string AddBag=> "LTSAddBag".Translate();
+        public static string ChangeBagDesc => "LTSChangeBagDesc".Translate();
         public static string DefaultAssociation => "LTSDefaultAssociation".Translate();
         public static string Disable => "LTSDisable".Translate();
         public static string DisableMod => "LTSDisableMod".Translate();
@@ -34,6 +40,10 @@ namespace Ammunition.Language {
         public static string HideMultipleGizmosDesc => "LTSHideMultipleGizmosDesc".Translate();
         public static string MechanoidAmmo => "LTSMechanoidAmmo".Translate();
         public static string MechanoidAmmoDesc => "LTSMechanoidAmmoDesc".Translate();
+        public static string LTSUseWiderGizmo => "LTSUseWiderGizmo".Translate();
+        public static string LTSUseWiderGizmoDesc => "LTSUseWiderGizmoDesc".Translate();
+        public static string LTSUseSingleLineAmmo => "LTSUseSingleLineAmmo".Translate();
+        public static string LTSUseSingleLineAmmoDesc => "LTSUseSingleLineAmmoDesc".Translate();
         public static string NoAmmoCategories => "LTSNoAmmoCategories".Translate();
         public static string NPCLessAmmo(int percentage) => "LTSNPCLessAmmo".Translate(percentage);
         public static string NPCLessAmmoDesc => "LTSNPCLessAmmoDesc".Translate();

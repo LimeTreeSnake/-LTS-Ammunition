@@ -20,7 +20,7 @@ namespace Ammunition.JobDrivers {
             yield return Toils_Goto.Goto(TargetIndex.A, PathEndMode.Touch);
             Things.Kit kit = TargetB.Thing as Things.Kit;
             if (kit != null) {
-                if (kit.KitComp.Props.bags > 0) {
+                if (kit.KitComp.Bags.Count > 0) {
                     yield return Toils.Toils_Take.LoadMagazine(TargetIndex.A, kit.KitComp);
                     yield return Toils.Toils_Take.OpportunisticLoadMagazine(reserveTargetA, TargetIndex.A, TargetA.Thing.def, kit.KitComp);
                 }

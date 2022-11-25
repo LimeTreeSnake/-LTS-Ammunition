@@ -7,6 +7,8 @@ using UnityEngine;
 using Verse;
 using System.Linq;
 using RimWorld;
+using System.Data.Common;
+using static HarmonyLib.Code;
 
 namespace Ammunition.Gizmos {
     [StaticConstructorOnStartup]
@@ -14,15 +16,24 @@ namespace Ammunition.Gizmos {
 
         private static readonly Texture2D DropIcon = ContentFinder<Texture2D>.Get("UI/Buttons/Dismiss", true);
         public KitComponent kitComp;
-        readonly float pocketWidth = 50;
-        readonly float columnWidth = 75;
-        readonly float unloadWidth = 20f;
         readonly float margin = 2f;
 
         private static readonly Texture2D FullAmmoBarTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.5f, 0.5f, 0.6f));
         private static readonly Texture2D BackgroundTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.1f, 0.1f, 0.1f, 0.75f));
         public override float GetWidth(float maxWidth) {
-            return (float)(columnWidth * Math.Ceiling((double)kitComp?.Props.bags / 2));
+            return (float)(GetColumnWidth() * (IsSingle() ? (int)Math.Ceiling((double)(kitComp.Bags.Count)) : (int)Math.Ceiling((double)(kitComp.Bags.Count) / 2)));
+        }
+        public float GetColumnWidth() {
+            return (float)(Settings.Settings.UseWiderGizmo ? 100f : 75f);
+        }
+        public float GetPocketWidth() {
+            return (float)(Settings.Settings.UseWiderGizmo ? 77f : 52f);
+        }
+        public float GetUnloadWidth() {
+            return (float)(Settings.Settings.UseWiderGizmo ? 22f : 22f);
+        }
+        public bool IsSingle() {
+            return Settings.Settings.UseSingleLineAmmo || kitComp.Bags.Count == 1;
         }
         public Gizmo_Ammunition(ref KitComponent comp) {
             kitComp = comp;
@@ -30,64 +41,76 @@ namespace Ammunition.Gizmos {
         }
 
         public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms) {
-            if (kitComp != null) {
-                try {
+            try {
+                if (kitComp != null && AmmoLogic.HaveAmmo) {
                     Rect borderRect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
                     Material material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
                     GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex, material, default);
-                    for (int i = 0; i < kitComp.Props.bags; i++) {
-                        if (kitComp.Bags[i].ChosenAmmo == null)
-                            kitComp.Bags[i].ChosenAmmo = AmmoLogic.AvailableAmmo.First();
-                        int column = (int)Math.Ceiling((double)(i + 1) / 2);
-                        int x = (int)(columnWidth * column);
-                        Rect innerRect;
-                        innerRect = i % 2 == 0 ? borderRect.ContractedBy(margin).TopHalf() : borderRect.ContractedBy(margin).BottomHalf();
-                        innerRect.width = columnWidth - margin;
-                        innerRect.x = borderRect.x + ((x - columnWidth)) + (margin / 2);
-                        if (i < 2)
-                            innerRect.x += margin / 2;
-                        Widgets.DrawWindowBackground(innerRect.LeftPartPixels(columnWidth - (margin*2)));
-                        Rect recLeft = innerRect.LeftPartPixels(pocketWidth).ContractedBy(1f);
-                        recLeft.x += margin;
-                        Rect recRightTop = innerRect.RightPartPixels(unloadWidth + margin / 2).ContractedBy(1f).TopHalf();
-                        recRightTop.x -= margin;
-                        Rect recRightBot = innerRect.RightPartPixels(unloadWidth + margin / 2).ContractedBy(1f).BottomHalf();
-                        recRightTop.x -= margin;
-                        if (Mouse.IsOver(recLeft.TopHalf())) {
-                            Widgets.DrawHighlight(recLeft.TopHalf());
-                        }
-                        float fillPercent = kitComp.Bags[i].Count / Mathf.Max(1f, kitComp.Bags[i].MaxCount);
-                        if (fillPercent > 1f)
-                            fillPercent = 1f;
-                        Widgets.FillableBar(recLeft, fillPercent, FullAmmoBarTex, TexUI.HighlightTex, false);
-                        Widgets.DrawTextureFitted(recLeft.ExpandedBy(margin / 2), kitComp.Bags[i].ChosenAmmo != null ? Widgets.GetIconFor(kitComp.Bags[i].ChosenAmmo) : Widgets.GetIconFor(kitComp.parent.def), 1);
-                        GUI.DrawTexture(recLeft.TopHalf(), BackgroundTex);
-                        Text.Font = GameFont.Small;
-                        Text.Anchor = TextAnchor.UpperLeft;
-                        Widgets.Label(recLeft, (i + 1).ToString());
-                        Text.Font = GameFont.Tiny;
-                        Text.Anchor = TextAnchor.LowerCenter;
-                        kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider(recLeft.BottomHalf(), kitComp.Bags[i].MaxCount, 0f, kitComp.Props.ammoCapacity[i], true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
-                        Text.Font = GameFont.Tiny;
-                        Text.Anchor = TextAnchor.MiddleCenter;
-                        Widgets.Dropdown(recLeft.TopHalf(), kitComp.Bags[i], (Models.Bag bag) => kitComp.Bags[i].ChosenAmmo, GenerateAmmoMenu, kitComp.Bags[i].ChosenAmmo?.LabelCap, BaseContent.ClearTex);
-                        if (Widgets.ButtonImage(recRightTop.ContractedBy(1), DropIcon) && kitComp.Bags[i].Count > 0) {
-                            DebugThingPlaceHelper.DebugSpawn(kitComp.Bags[i].ChosenAmmo, kitComp.parent.PositionHeld, kitComp.Bags[i].Count);
-                            kitComp.Bags[i].Count = 0;
-                            kitComp.Bags[i].MaxCount = 0;
-                        }
-                        Texture2D image = kitComp.Bags[i].Use ? Widgets.CheckboxOnTex : Widgets.CheckboxOffTex;
-                        if (Widgets.ButtonImage(recRightBot.ContractedBy(1), image)) {
-                            kitComp.Bags[i].Use = !kitComp.Bags[i].Use;
+                    if (kitComp.Bags.Any()) {
+                        for (int i = 0; i < kitComp.Bags.Count; i++) {
+                            if (kitComp.Bags[i].ChosenAmmo == null)
+                                kitComp.Bags[i].ChosenAmmo = Settings.Settings.InitialAmmoType != null ? Settings.Settings.InitialAmmoType : AmmoLogic.AvailableAmmo.First();
+                            Rect innerRect;
+                            int heightAdjust = 0;
+                            int columns = 0;
+                            if (IsSingle()) {
+                                columns = (int)Math.Ceiling((double)(i + 1));
+                                innerRect = borderRect.ContractedBy(margin);
+                                heightAdjust = 16;
+                            }
+                            else {
+                                columns = (int)Math.Ceiling((double)(i + 1) / 2);
+                                innerRect = i % 2 == 0 ? borderRect.ContractedBy(margin).TopHalf() : borderRect.ContractedBy(margin).BottomHalf();
+                            }
+                            int x = (int)(GetColumnWidth() * columns);
+                            innerRect.width = GetColumnWidth() - (margin * 2);
+                            innerRect.x = borderRect.x + (x - GetColumnWidth());
+                            if (i < 2)
+                                innerRect.x += margin;
+                            Widgets.DrawWindowBackground(innerRect);
+                            Rect recLeft = innerRect.LeftPartPixels(GetPocketWidth()).ContractedBy(margin);
+                            Rect recLeftTop = recLeft.TopHalf();
+                            Rect recLeftBot = recLeft.BottomHalf();
+                            Rect recRight = innerRect.RightPartPixels(GetUnloadWidth()).ContractedBy(margin);
+                            Rect recRightTop = recRight.TopHalf();
+                            recRightTop.height -= heightAdjust;
+                            Rect recRightBot = recRight.BottomHalf();
+                            recRightBot.height -= heightAdjust;
+                            if (Mouse.IsOver(recLeftTop)) {
+                                Widgets.DrawHighlight(recLeftTop);
+                            }
+                            float fillPercent = kitComp.Bags[i].Count / Mathf.Max(1f, kitComp.Bags[i].MaxCount);
+                            if (fillPercent > 1f)
+                                fillPercent = 1f;
+                            Widgets.FillableBar(recLeft, fillPercent, FullAmmoBarTex, TexUI.HighlightTex, false);
+                            Widgets.DrawTextureFitted(recLeft, Widgets.GetIconFor(kitComp.Bags[i].ChosenAmmo), 0.95f);
+                            GUI.DrawTexture(recLeftTop, BackgroundTex);
+                            Widgets.Dropdown(recLeftTop, kitComp.Bags[i], (Models.Bag bag) => kitComp.Bags[i].ChosenAmmo, GenerateAmmoMenu, kitComp.Bags[i].ChosenAmmo?.LabelCap, BaseContent.ClearTex);
+                            Text.Font = GameFont.Small;
+                            Text.Anchor = TextAnchor.UpperLeft;
+                            Widgets.Label(recLeft, (i + 1).ToString());
+                            Text.Font = GameFont.Tiny;
+                            Text.Anchor = TextAnchor.LowerCenter;
+                            kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider(recLeftBot, kitComp.Bags[i].MaxCount, 0f, kitComp.Bags[i].Capacity, true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
+                            Text.Font = GameFont.Tiny;
+                            Text.Anchor = TextAnchor.MiddleCenter;
+                            if (Widgets.ButtonImage(recRightTop, DropIcon) && kitComp.Bags[i].Count > 0) {
+                                DebugThingPlaceHelper.DebugSpawn(kitComp.Bags[i].ChosenAmmo, kitComp.parent.PositionHeld, kitComp.Bags[i].Count);
+                                kitComp.Bags[i].Count = 0;
+                                kitComp.Bags[i].MaxCount = 0;
+                            }
+                            TooltipHandler.TipRegion(recRightTop, Language.Translate.DropAll);
+                            Texture2D image = kitComp.Bags[i].Use ? Widgets.CheckboxOnTex : Widgets.CheckboxOffTex;
+                            if (Widgets.ButtonImage(recRightBot, image)) {
+                                kitComp.Bags[i].Use = !kitComp.Bags[i].Use;
+                            }
+                            TooltipHandler.TipRegion(recRightBot, Language.Translate.CanUse);
                         }
                     }
                 }
-                catch (Exception ex) {
-                    Log.Error(ex.Message);
-                }
             }
-            else {
-                Rect rect = new Rect(topLeft.x, topLeft.y, this.GetWidth(maxWidth), 75f);
+            catch (Exception ex) {
+                Log.Error("LTS_Ammo framework GizmoOnGUI: " + ex.Message);
             }
             Text.Anchor = TextAnchor.UpperLeft;
             Text.Font = GameFont.Small;
