@@ -4,7 +4,7 @@
         <defName>DoBillsAmmunitionBench</defName>
         <label>make ammo</label>
         <giverClass>WorkGiver_DoBill</giverClass>
-        <workType>Crafting</workType>
+        <workType>LTS_Tasks</workType>
         <priorityInType>105</priorityInType>
         <fixedBillGiverDefs>
             <li>LTS_AmmunitionBench</li>
@@ -20,7 +20,7 @@
         <defName>LTS_DoLoadKit</defName>
         <label>load kit</label>
         <giverClass>Ammunition.WorkGivers.WorkGiver_LoadKit</giverClass>
-        <workType>BasicWorker</workType>
+        <workType>LTS_Tasks</workType>
         <priorityInType>88</priorityInType>
         <canBeDoneWhileDrafted>true</canBeDoneWhileDrafted>
         <verb>load kit</verb>
@@ -33,7 +33,7 @@
         <defName>LTS_DoStrip</defName>
         <label>loot ammo</label>
         <giverClass>Ammunition.WorkGivers.WorkGiver_LootAmmo</giverClass>
-        <workType>Hauling</workType>
+        <workType>LTS_Tasks</workType>
         <priorityInType>101</priorityInType>
         <canBeDoneWhileDrafted>true</canBeDoneWhileDrafted>
         <verb>pilfer</verb>

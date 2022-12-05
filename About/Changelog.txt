@@ -1,4 +1,8 @@
 ﻿[LTS]Ammunition - Framework
+2022-12-05
+    - Kit techlevel Industrial -> Medieval
+    - Adjusted to changes in LTS_Systems
+
 2022-11-25
     - Reworked kits code for more customization in mod settings. Only affects newly spawned kits.
     - Ammunition is pre-selected to first usable ammo when equpping a kit whilst holding a weapon.

@@ -2,7 +2,7 @@
 <Defs>
     <ThingDef Name="PackBase" ParentName="ApparelMakeableBase" Abstract="True">
         <thingClass>Ammunition.Things.Kit</thingClass>
-        <techLevel>Industrial</techLevel>
+        <techLevel>Medieval</techLevel>
         <recipeMaker>
             <recipeUsers>
                 <li>ElectricTailoringBench</li>
