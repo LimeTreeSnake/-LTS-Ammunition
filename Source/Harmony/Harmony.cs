@@ -28,19 +28,18 @@ namespace Ammunition.Harmony {
             //harmony.Patch(AccessTools.Method(typeof(ReverseDesignatorDatabase), "InitDesignators"), null, new HarmonyMethod(typeof(Harmony).GetMethod("InitDesignators_PostFix")));
             harmony.Patch(AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"), null, new HarmonyMethod(typeof(Harmony).GetMethod("AddHumanlikeOrders_PostFix")));
             Logic.AmmoLogic.Initialize();
-
         }
         [HarmonyPriority(150)]
-        public static bool WarmupComplete_PreFix(ref Verb_LaunchProjectile __instance) {
+        public static bool WarmupComplete_PreFix(Verb_LaunchProjectile __instance) {
             return Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
         }
         [HarmonyPriority(150)]
-        public static bool TryCastShot_PreFix(ref Verb_LaunchProjectile __instance, ref bool __result) {
+        public static bool TryCastShot_PreFix(bool __result, Verb_LaunchProjectile __instance) {
             __result = Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
             return __result;
         }
         [HarmonyPriority(150)]
-        public static void Projectile_PostFix(ref Verb_LaunchProjectile __instance, ref ThingDef __result) {
+        public static void Projectile_PostFix(Verb_LaunchProjectile __instance, ThingDef __result) {
             if (__result == null)
                 return;
             if (Logic.AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out KitComponent comp, false)) {
@@ -52,22 +51,22 @@ namespace Ammunition.Harmony {
                 __result = null;
             }
         }
-        public static void HasHuntingWeapon_PostFix(ref Pawn p, ref bool __result) {
+        public static void HasHuntingWeapon_PostFix(Pawn p, bool __result) {
             if (__result) {
                 __result = Logic.AmmoLogic.AmmoCheck(p, p.equipment.Primary, out _, false);
             }
         }
-        public static void GeneratePawn_PostFix(ref Pawn __result) {
+        public static void GeneratePawn_PostFix(Pawn __result) {
             if (__result != null && __result.apparel != null) {
                 Logic.AmmoLogic.EquipPawn(__result);
             }
         }
-        public static void RedressPawn_PostFix(ref Pawn pawn) {
+        public static void RedressPawn_PostFix(Pawn pawn) {
             if (pawn != null && pawn.apparel != null) {
                 Logic.AmmoLogic.EquipPawn(pawn);
             }
         }
-        public static void InitDesignators_PostFix(ref List<Designator> ___desList) {
+        public static void InitDesignators_PostFix(List<Designator> ___desList) {
             ___desList.Add(new Designators.Designator_LootAmmo());
         }
         public static void AddHumanlikeOrders_PostFix(Vector3 clickPos, Pawn pawn, List<FloatMenuOption> opts) {

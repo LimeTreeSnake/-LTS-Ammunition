@@ -1,4 +1,12 @@
 ﻿[LTS]Ammunition - Framework
+2022-12-26
+    - Weapons show in their description what ammo they can use with hyperlinks.
+    - removed animals/mechs use ammo, they can fire freely always. Feel free to discuss this on my discord.
+    - Added component tag to allow kit to be included when equipping new pawn without a kit.
+    - Altered kit spawning logic.
+    - Removed turret buildings from available weapons list.
+    - Added icons for weapons in mod settings.
+    
 2022-12-05
     - Kit techlevel Industrial -> Medieval
     - Adjusted to changes in LTS_Systems

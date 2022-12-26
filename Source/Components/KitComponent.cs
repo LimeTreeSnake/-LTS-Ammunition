@@ -37,7 +37,7 @@ namespace Ammunition.Components {
             if (Settings.Settings.BagSettingsDictionary.TryGetValue(parent.def.defName, out List<int> bagSettings)) {
                 for (int i = 0; i < bagSettings.Count; i++) {
                     Bag bag = new Bag {
-                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
+                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetDefaultAmmo() : Settings.Settings.InitialAmmoType,
                         Count = 0,
                         Capacity = bagSettings[i],
                         MaxCount = bagSettings[i],
@@ -50,7 +50,7 @@ namespace Ammunition.Components {
                 CompProps_Kit compProps_Kit = props as CompProps_Kit;
                 for (int i = 0; i < compProps_Kit.ammoCapacity.Count; i++) {
                     Bag bag = new Bag {
-                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetAmmoFromString() : Settings.Settings.InitialAmmoType,
+                        ChosenAmmo = Settings.Settings.InitialAmmoType == null ? Settings.Settings.GetDefaultAmmo() : Settings.Settings.InitialAmmoType,
                         Count = 0,
                         Capacity = compProps_Kit.ammoCapacity[i],
                         MaxCount = compProps_Kit.ammoCapacity[i],
@@ -112,6 +112,7 @@ namespace Ammunition.Components {
 
     public class CompProps_Kit : CompProperties {
         public List<int> ammoCapacity;
+        public bool canBeGenerated = true;
         public CompProps_Kit() {
             compClass = typeof(KitComponent);
         }

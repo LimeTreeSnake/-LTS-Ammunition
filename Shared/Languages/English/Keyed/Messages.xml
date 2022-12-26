@@ -3,7 +3,7 @@
     <!--Mod Settings-->
     <LTSAmmunition>Ammunition</LTSAmmunition>
     <LTSAmmunitionCategory>Category: </LTSAmmunitionCategory>
-    <LTSAnimalAmmo>Animals require ammo</LTSAnimalAmmo>
+    <LTSAnimalAmmo>Animals require ammo:; (Don't use, animals probably can't wear kits)</LTSAnimalAmmo>
     <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
     <LTSAvailableAmmoCategory>Ammunition in category.</LTSAvailableAmmoCategory>
     <LTSAvailableKits>Available kits.</LTSAvailableKits>
@@ -18,7 +18,7 @@
     <LTSExemptWeapon>If checked, this weapon requires ammo.</LTSExemptWeapon>
     <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
     <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
-    <LTSMechanoidAmmo>Mechanoids require ammo</LTSMechanoidAmmo>
+    <LTSMechanoidAmmo>Mechanoids require ammo: (Don't use, mechs probably can't wear kits)</LTSMechanoidAmmo>
     <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
     <LTSUseWiderGizmo>Wider ammo gizmo</LTSUseWiderGizmo>
     <LTSUseWiderGizmoDesc>Whether to use the slightly wider gizmo (true) or the standard vanilla gizmo size (false)</LTSUseWiderGizmoDesc>

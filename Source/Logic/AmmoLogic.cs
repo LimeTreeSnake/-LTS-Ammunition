@@ -10,6 +10,7 @@ using Ammunition.Components;
 using Ammunition.DefModExtensions;
 using Ammunition.Models;
 using Ammunition.Things;
+using System.Text;
 
 namespace Ammunition.Logic {
 
@@ -105,7 +106,7 @@ namespace Ammunition.Logic {
             if (!strippable.AnythingToStrip()) {
                 return false;
             }
-            if (thing is Things.Kit kit) {
+            if (thing is Kit kit) {
                 foreach (var item in kit.KitComp.Bags) {
                     if (item.Count > 0) {
                         return true;
@@ -133,9 +134,9 @@ namespace Ammunition.Logic {
         public static void LootAmmo(Thing thing) {
             Pawn pawn = thing as Pawn ?? (thing as Corpse).InnerPawn;
             if (pawn != null) {
-                List<Things.Kit> kits = GetWornKits(pawn)?.ToList();
+                List<Kit> kits = GetWornKits(pawn)?.ToList();
                 if (kits != null && kits.Count > 0) {
-                    foreach (Things.Kit kit in kits) {
+                    foreach (Kit kit in kits) {
                         for (int i = 0; i < kit.KitComp.Bags.Count; i++) {
                             if (kit.KitComp.Bags[i].Count > 0) {
                                 DebugThingPlaceHelper.DebugSpawn(kit.KitComp.Bags[i].ChosenAmmo, kit.SpawnedParentOrMe.PositionHeld, kit.KitComp.Bags[i].Count);
@@ -146,27 +147,43 @@ namespace Ammunition.Logic {
                 }
             }
         }
+
+        public static void LoadSpawnedKit(Kit apparel, AmmoCategoryDef def, Pawn pawn = null) {
+            for (int i = 0; i < apparel.KitComp.Bags.Count; i++) {
+                string ammoDef = def.ammoDefs.RandomElement();
+                apparel.KitComp.Bags[i].ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
+                if (apparel.KitComp.Bags[i].ChosenAmmo != null) {
+                    apparel.KitComp.Bags[i].MaxCount = apparel.KitComp.Props.ammoCapacity[i];
+                    apparel.KitComp.Bags[i].Count = (int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] / 3, apparel.KitComp.Props.ammoCapacity[i]) * Settings.Settings.PawnAmmoSpawnRate);
+                    if (pawn != null) {
+                        apparel.SetStyleDef(pawn.Ideo?.GetStyleFor(apparel.def));
+                    }
+                }
+                else {
+                    Log.Message("There are somehow no ammo within randomly chosen category.");
+                    apparel.Destroy();
+                }
+            }
+        }
         public static void EquipPawn(Pawn p) {
             try {
                 if (p.apparel != null) {
-                    Things.Kit apparel;
-                    //Removes all spawned kits
-                    if (p.apparel.WornApparelCount > 1) {
-                        apparel = (Things.Kit)p.apparel.WornApparel.FirstOrDefault(x => x.TryGetComp<KitComponent>() != null);
-                        while (apparel != null) {
-                            p.apparel.Remove(apparel);
-                            apparel.Destroy();
-                            apparel = null;
-                            apparel = (Things.Kit)p.apparel.WornApparel.FirstOrDefault(x => x.TryGetComp<KitComponent>() != null);
-                        }
-                    }
-                    if ((p.RaceProps.IsMechanoid && !Settings.Settings.UseMechanoidAmmo) || (p.RaceProps.Animal && !Settings.Settings.UseAnimalAmmo)) {
+                    if ((p.RaceProps.IsMechanoid /*&& !Settings.Settings.UseMechanoidAmmo*/) || (p.RaceProps.Animal /*&& !Settings.Settings.UseAnimalAmmo*/)) {
                         return;
+                    }
+                    Kit apparel = null;
+                    if (p.apparel.WornApparelCount > 1) {
+                        apparel = (Kit)p.apparel.WornApparel.FirstOrDefault(x => x.TryGetComp<KitComponent>() != null);
                     }
                     if (p.equipment != null && p.equipment.Primary != null) {
                         IEnumerable<AmmoCategoryDef> categories = AmmoCategoryDefs.Where(x => Settings.Settings.CategoryWeaponDictionary.TryGetValue(x.defName, out Dictionary<string, bool> wep) == true && wep != null && wep.TryGetValue(p.equipment.Primary.def.defName, out bool res) && res);
                         if (categories != null && categories.Count() > 0) {
-                            List<ThingDef> sorted = AvailableKits.OrderBy(x => x.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum()).ToList();
+                            if (apparel != null) {
+                                LoadSpawnedKit(apparel, categories.RandomElement(), p);
+                                return;
+                            }
+                            //If not already wearing kit.
+                            List<ThingDef> sorted = AvailableKits.Where(y => y.GetCompProperties<CompProps_Kit>().canBeGenerated && p.apparel.CanWearWithoutDroppingAnything(y)).OrderBy(x => x.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum()).ToList();
                             ThingDef kit = null;
                             if (Settings.Settings.UseAmmoPerBullet && p.equipment.Primary.def.Verbs.FirstOrDefault(x => x.verbClass == typeof(Verb_LaunchProjectile)) != null) {
                                 int burstCount = p.equipment.Primary.def.Verbs.FirstOrDefault(x => x.verbClass == typeof(Verb_LaunchProjectile)).burstShotCount;
@@ -185,28 +202,10 @@ namespace Ammunition.Logic {
                             if (kit == null) {
                                 kit = sorted.First();
                             }
-                            if (kit != null) {
-                                apparel = (Things.Kit)ThingMaker.MakeThing(kit, GenStuff.AllowedStuffsFor(kit, TechLevel.Undefined).RandomElement());
-                                if (apparel != null) {
-                                    p.apparel.Wear(apparel);
-                                    for (int i = 0; i < apparel.KitComp.Bags.Count; i++) {
-                                        AmmoCategoryDef ammoCatDef = categories.RandomElement();
-                                        string ammoDef = ammoCatDef.ammoDefs.RandomElement();
-                                        apparel.KitComp.Bags[i].ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
-                                        if (apparel.KitComp.Bags[i].ChosenAmmo != null) {
-                                            apparel.KitComp.Bags[i].MaxCount = apparel.KitComp.Props.ammoCapacity[i];
-                                            apparel.KitComp.Bags[i].Count = (int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] / 3, apparel.KitComp.Props.ammoCapacity[i]) * Settings.Settings.PawnAmmoSpawnRate);
-                                            apparel.SetStyleDef(p.Ideo?.GetStyleFor(apparel.def));
-                                        }
-                                        else {
-                                            Log.Message("There are somehow no ammo within randomly chosen category.");
-                                            apparel.Destroy();
-                                        }
-                                    }
-                                }
-                            }
-                            else {
-                                Log.Message("There are no kits satisfying the required ammo.");
+                            apparel = (Kit)ThingMaker.MakeThing(kit, GenStuff.AllowedStuffsFor(kit, TechLevel.Undefined).RandomElement());
+                            if (apparel != null) {
+                                p.apparel.Wear(apparel);
+                                LoadSpawnedKit(apparel, categories.RandomElement(), p);
                             }
                         }
                     }
@@ -264,7 +263,8 @@ namespace Ammunition.Logic {
                         Settings.Settings.BagSettingsDictionary.Add(def.defName, intList);
                     }
                 }
-                Settings.Settings.GetAmmoFromString();
+                Settings.Settings.GetDefaultAmmo();
+                ResetHyperlinks();
             }
             catch (Exception ex) {
                 Log.Error("Error initializing Ammunition Framework: " + ex.Message);
@@ -272,7 +272,7 @@ namespace Ammunition.Logic {
         }
         internal static void GenerateLists() {
             AmmoCategoryDefs = DefDatabase<AmmoCategoryDef>.AllDefsListForReading;
-            AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.IsWeaponUsingProjectiles && x.HasComp(typeof(CompEquippable)) && x.IsWithinCategory(ThingCategoryDefOf.Weapons) && !x.IsApparel)?.ToList();
+            AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.IsWeaponUsingProjectiles && x.HasComp(typeof(CompEquippable)) && x.IsWithinCategory(ThingCategoryDefOf.Weapons) && !x.IsApparel && !x.IsBuildingArtificial)?.ToList();
             AvailableAmmo = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.HasModExtension<AmmunitionExtension>())?.ToList();
             AvailableKits = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.HasComp(typeof(KitComponent)))?.ToList();
         }
@@ -292,6 +292,31 @@ namespace Ammunition.Logic {
             Settings.Settings.ExemptionWeaponDictionary = new Dictionary<string, bool>();
             Settings.Settings.BagSettingsDictionary = new Dictionary<string, List<int>>();
             Initialize(false);
+        }
+        internal static void ResetHyperlinks() {
+            if (AvailableProjectileWeapons.Any() && AvailableAmmo.Any()) {
+                foreach (ThingDef def in AvailableProjectileWeapons) {
+                    ResetHyperLinksForWeapon(def);
+                }
+            }
+        }
+        internal static void ResetHyperLinksForWeapon(ThingDef def) {
+            if (def.descriptionHyperlinks != null && def.descriptionHyperlinks.Any()) {
+                for (int i = 0; i < def.descriptionHyperlinks.Count; i++) {
+                    if (AvailableAmmo.Contains(def.descriptionHyperlinks[i].def)) {
+                        def.descriptionHyperlinks.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            foreach (ThingDef ammoDef in AvailableAmmo) {
+                if (WeaponDefCanUseAmmoDef(def.defName, ammoDef.defName)) {
+                    if (def.descriptionHyperlinks == null) {
+                        def.descriptionHyperlinks = new List<DefHyperlink>();
+                    }
+                    def.descriptionHyperlinks.Add(ammoDef);
+                }
+            }
         }
         internal static void Save() {
             try {
@@ -345,16 +370,19 @@ namespace Ammunition.Logic {
                     return true;
                 if (weapon.def.IsMeleeWeapon || !AmmoCategoryDefs.Any())
                     return true;
-                if ((pawn.RaceProps.IsMechanoid && !Settings.Settings.UseMechanoidAmmo) || (pawn.RaceProps.Animal && !Settings.Settings.UseAnimalAmmo))
+                if ((pawn.RaceProps.IsMechanoid /*&& !Settings.Settings.UseMechanoidAmmo*/) || (pawn.RaceProps.Animal /*&& !Settings.Settings.UseAnimalAmmo*/))
                     return true;
+                else {
+                    //Fire from inventory?
+                }
                 if (IsExempt(weapon.def.defName)) {
                     return true;
                 }
                 //If all prior "fails", this means the weapon needs ammo.
                 if (pawn.apparel.WornApparelCount > 0) {
-                    List<Things.Kit> kits = GetWornKits(pawn);
+                    List<Kit> kits = GetWornKits(pawn);
                     if (kits.Any()) {
-                        foreach (Things.Kit kit in kits) {
+                        foreach (Kit kit in kits) {
                             kitComp = kit.KitComp;
                             for (int i = 0; i < kitComp.Bags.Count; i++) {
                                 if (kitComp.Bags[i].Use && kitComp.Bags[i].ChosenAmmo != null && kitComp.Bags[i].Count > 0) {
@@ -415,10 +443,10 @@ namespace Ammunition.Logic {
             }
             return false;
         }
-        public static List<Things.Kit> GetWornKits(Pawn pawn) {
-            List<Things.Kit> kits = new List<Things.Kit>();
+        public static List<Kit> GetWornKits(Pawn pawn) {
+            List<Kit> kits = new List<Kit>();
             foreach (Apparel app in pawn.apparel.WornApparel.Where(x => x.TryGetComp<KitComponent>() != null)) {
-                kits.Add(app as Things.Kit);
+                kits.Add(app as Kit);
             }
             return kits;
         }

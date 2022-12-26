@@ -35,7 +35,7 @@ namespace Ammunition.Gizmos {
         public bool IsSingle() {
             return Settings.Settings.UseSingleLineAmmo || kitComp.Bags.Count == 1;
         }
-        public Gizmo_Ammunition(ref KitComponent comp) {
+        public Gizmo_Ammunition(KitComponent comp) {
             kitComp = comp;
             this.Order = -50f;
         }
@@ -91,7 +91,7 @@ namespace Ammunition.Gizmos {
                             Widgets.Label(recLeft, (i + 1).ToString());
                             Text.Font = GameFont.Tiny;
                             Text.Anchor = TextAnchor.LowerCenter;
-                            kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider(recLeftBot, kitComp.Bags[i].MaxCount, 0f, kitComp.Bags[i].Capacity, true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
+                            kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider_NewTemp(recLeftBot, kitComp.Bags[i].MaxCount, 0f, kitComp.Bags[i].Capacity, true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
                             Text.Font = GameFont.Tiny;
                             Text.Anchor = TextAnchor.MiddleCenter;
                             if (Widgets.ButtonImage(recRightTop, DropIcon) && kitComp.Bags[i].Count > 0) {

@@ -40,8 +40,8 @@ namespace Ammunition.Settings {
         private static bool hideMultipleGizmos = true;
         private static float pawnAmmoSpawnRate = 1f;
         private static bool useAmmoPerBullet = false;
-        private static bool useAnimalAmmo = false;
-        private static bool useMechanoidAmmo = false;
+        //private static bool useAnimalAmmo = false;
+        //private static bool useMechanoidAmmo = false;
         private static bool useSingleLineAmmo = false;
         private static bool useWiderGizmo = false;
         private static string initialAmmoString;
@@ -68,8 +68,8 @@ namespace Ammunition.Settings {
         public static bool HideMultipleGizmos => hideMultipleGizmos;
         public static float PawnAmmoSpawnRate => pawnAmmoSpawnRate;
         public static bool UseAmmoPerBullet => useAmmoPerBullet;
-        public static bool UseAnimalAmmo => useAnimalAmmo;
-        public static bool UseMechanoidAmmo => useMechanoidAmmo;
+        //public static bool UseAnimalAmmo => useAnimalAmmo;
+        //public static bool UseMechanoidAmmo => useMechanoidAmmo;
         public static bool UseSingleLineAmmo => useSingleLineAmmo;
         public static bool UseWiderGizmo => useWiderGizmo;
         public static ThingDef InitialAmmoType => initialAmmoType;
@@ -82,10 +82,10 @@ namespace Ammunition.Settings {
             Scribe_Values.Look(ref hideMultipleGizmos, "HideMultipleGizmos", true, false);
             Scribe_Values.Look(ref pawnAmmoSpawnRate, "PawnAmmoSpawnRate", 1f, false);
             Scribe_Values.Look(ref useAmmoPerBullet, "UseAmmoPerBullet", true, false);
-            Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
+            //Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
             Scribe_Values.Look(ref useSingleLineAmmo, "UseSingleLineAmmo", false, false);
             Scribe_Values.Look(ref useWiderGizmo, "UseWiderGizmo", false, false);
-            Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
+            //Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
             Scribe_Values.Look(ref initialAmmoString, "InitialAmmoString", "");
             base.ExposeData();
         }
@@ -101,7 +101,7 @@ namespace Ammunition.Settings {
                 BagSettingsDictionary = new Dictionary<string, List<int>>();
             }
         }
-        public static ThingDef GetAmmoFromString() {
+        public static ThingDef GetDefaultAmmo() {
             if (initialAmmoString.NullOrEmpty()) {
                 initialAmmoType = AmmoLogic.AvailableAmmo.FirstOrDefault();
                 initialAmmoString = initialAmmoType.defName;
@@ -115,8 +115,8 @@ namespace Ammunition.Settings {
             disableAmmoUsage = false;
             hideMultipleGizmos = true;
             useAmmoPerBullet = false;
-            useAnimalAmmo = false;
-            useMechanoidAmmo = false;
+            //useAnimalAmmo = false;
+            //useMechanoidAmmo = false;
             useSingleLineAmmo = false;
             useWiderGizmo = false;
             pawnAmmoSpawnRate = 1f;
@@ -152,19 +152,19 @@ namespace Ammunition.Settings {
                     }
                     TooltipHandler.TipRegion(rect2, Translate.HideMultipleGizmosDesc);
 
-                    Rect rect3 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect3, Translate.MechanoidAmmo, ref useMechanoidAmmo);
-                    if (Mouse.IsOver(rect3)) {
-                        Widgets.DrawHighlight(rect3);
-                    }
-                    TooltipHandler.TipRegion(rect3, Translate.MechanoidAmmoDesc);
+                    //Rect rect3 = list.GetRect(lineHeight);
+                    //Widgets.CheckboxLabeled(rect3, Translate.MechanoidAmmo, ref useMechanoidAmmo);
+                    //if (Mouse.IsOver(rect3)) {
+                    //    Widgets.DrawHighlight(rect3);
+                    //}
+                    //TooltipHandler.TipRegion(rect3, Translate.MechanoidAmmoDesc);
 
-                    Rect rect4 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect4, Translate.AnimalAmmo, ref useAnimalAmmo);
-                    if (Mouse.IsOver(rect4)) {
-                        Widgets.DrawHighlight(rect4);
-                    }
-                    TooltipHandler.TipRegion(rect4, Translate.AnimalAmmoDesc);
+                    //Rect rect4 = list.GetRect(lineHeight);
+                    //Widgets.CheckboxLabeled(rect4, Translate.AnimalAmmo, ref useAnimalAmmo);
+                    //if (Mouse.IsOver(rect4)) {
+                    //    Widgets.DrawHighlight(rect4);
+                    //}
+                    //TooltipHandler.TipRegion(rect4, Translate.AnimalAmmoDesc);
 
                     Rect rect5 = list.GetRect(lineHeight);
                     Widgets.CheckboxLabeled(rect5, Translate.LTSUseSingleLineAmmo, ref useSingleLineAmmo);
@@ -185,7 +185,7 @@ namespace Ammunition.Settings {
                     Rect rect8 = list.GetRect(lineHeight);
                     Widgets.Label(rect7, Translate.NPCLessAmmo((int)(pawnAmmoSpawnRate * 100)));
                     TooltipHandler.TipRegion(rect7, Translate.AnimalAmmoDesc);
-                    pawnAmmoSpawnRate = Widgets.HorizontalSlider(rect8.ContractedBy(margin), pawnAmmoSpawnRate, 0.1f, 1f);
+                    pawnAmmoSpawnRate = Widgets.HorizontalSlider_NewTemp(rect8.ContractedBy(margin), pawnAmmoSpawnRate, 0.1f, 1f, true, "");
 
                     list.GapLine(2);
                     // Kit settings
@@ -347,8 +347,11 @@ namespace Ammunition.Settings {
                                         break;
                                 }
                                 Rect weaponRect = WeaponsList.GetRect(lineHeight);
-                                Rect mainWeaponRect = weaponRect.LeftPartPixels(weaponRect.width - 25);
+                                Rect iconRect = weaponRect.LeftPartPixels(25);
+                                Rect mainWeaponRect = weaponRect.LeftPartPixels(weaponRect.width - 50);
+                                mainWeaponRect.x += 25;
                                 Rect subWeaponRect = weaponRect.RightPartPixels(25f);
+                                Widgets.DrawTextureFitted(iconRect, Widgets.GetIconFor(thingDef), 0.95f);
                                 CategoryWeaponDictionary.TryGetValue(chosenCategory.defName, out Dictionary<string, bool> dic);
                                 dic.TryGetValue(thingDef.defName, out bool res);
                                 ExemptionWeaponDictionary.TryGetValue(thingDef.defName, out bool exemption);
@@ -375,12 +378,14 @@ namespace Ammunition.Settings {
                                 Widgets.CheckboxLabeled(mainWeaponRect, " " + thingDef.LabelCap, ref val, false);
                                 if (val != res) {
                                     dic.SetOrAdd(thingDef.defName, val);
+                                    AmmoLogic.ResetHyperLinksForWeapon(thingDef);
                                     changesMade = true;
                                 }
                                 TooltipHandler.TipRegion(subWeaponRect, Translate.ExemptWeapon);
                                 Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false, Ammo_Disabled, Ammo_Enabled);
                                 if (val2 != exemption) {
                                     ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, val2);
+                                    AmmoLogic.ResetHyperLinksForWeapon(thingDef);
                                     changesMade = true;
                                 }
                             }
