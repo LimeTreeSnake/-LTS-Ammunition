@@ -1,4 +1,8 @@
 ﻿[LTS]Ammunition - Framework
+2023-
+    - Fixed issue with pawns trying to fire without ammo when using per bullet mode.
+    - Fixed issue where spawned children spawned with kits they can't wear.
+
 2022-12-26
     - Weapons show in their description what ammo they can use with hyperlinks.
     - removed animals/mechs use ammo, they can fire freely always. Feel free to discuss this on my discord.
