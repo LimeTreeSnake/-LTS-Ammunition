@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-    <Defs>
-        <RecordDef>
-            <defName>LTS_BodiesLooted</defName>
-            <label>bodies looted</label>
-            <description>The number of bodies I have looted.</description>
-            <type>Int</type>
-        </RecordDef>
-    </Defs>

@@ -4,435 +4,628 @@ using Ammunition.Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using RimWorld;
-using Ammunition.Things;
 using Ammunition.Components;
-using System.Security.Cryptography;
 
-namespace Ammunition.Settings {
-    public class AmmunitionSettings : Mod {
+namespace Ammunition.Settings
+{
+	public class AmmunitionSettings : Mod
+	{
 
-        private readonly Settings settings;
+		private readonly Settings _settings;
 
-        public AmmunitionSettings(ModContentPack content) : base(content) {
-            settings = GetSettings<Settings>();
-            settings.Initialize();
-        }
-        public override string SettingsCategory() {
-            return "LTS Ammunition";
-        }
-        public override void DoSettingsWindowContents(Rect inRect) {
-            settings.DoWindowContents(inRect);
-        }
-    }
+		public AmmunitionSettings(ModContentPack content) : base(content)
+		{
+			_settings = this.GetSettings<Settings>();
+			Settings.Initialize();
+		}
 
+		public override string SettingsCategory()
+		{
+			return "LTS Ammunition";
+		}
 
-    public class Settings : ModSettings {
-
-        public Texture2D Ammo_Disabled => ContentFinder<Texture2D>.Get("Icons/Ammo_disabled", true);
-        public Texture2D Ammo_Enabled => ContentFinder<Texture2D>.Get("Icons/Ammo_enabled", true);
-        #region Fields
-        private static bool disableAmmoUsage = false;
-        private static bool hideMultipleGizmos = true;
-        private static float pawnAmmoSpawnRate = 1f;
-        private static bool useAmmoPerBullet = false;
-        //private static bool useAnimalAmmo = false;
-        //private static bool useMechanoidAmmo = false;
-        private static bool useSingleLineAmmo = false;
-        private static bool useWiderGizmo = false;
-        private static string initialAmmoString;
-        private static ThingDef initialAmmoType;
-        private static AmmoCategoryDef chosenCategory = null;
-        private static ThingDef chosenKit = null;
-        private static bool enable, disable, enableMod, disableMod, changesMade;
-        private static bool
-        Neolithic = true,
-        Medieval = true,
-        Industrial = true,
-        Spacer = true,
-        Ultra = true,
-        Archotech = true;
-        private static string SearchFilter = "";
-        private Vector2 scrollWeaponsPos;
-        private static readonly float margin = 4f;
-        private static readonly float lineHeight = Text.LineHeight;
-        private static bool firstPage = true;
-        #endregion Fields
+		public override void DoSettingsWindowContents(Rect inRect)
+		{
+			_settings.DoWindowContents(inRect);
+		}
+	}
 
 
-        public static bool DisableAmmoUsage => disableAmmoUsage;
-        public static bool HideMultipleGizmos => hideMultipleGizmos;
-        public static float PawnAmmoSpawnRate => pawnAmmoSpawnRate;
-        public static bool UseAmmoPerBullet => useAmmoPerBullet;
-        //public static bool UseAnimalAmmo => useAnimalAmmo;
-        //public static bool UseMechanoidAmmo => useMechanoidAmmo;
-        public static bool UseSingleLineAmmo => useSingleLineAmmo;
-        public static bool UseWiderGizmo => useWiderGizmo;
-        public static ThingDef InitialAmmoType => initialAmmoType;
-        public static Dictionary<string, Dictionary<string, bool>> CategoryWeaponDictionary;
-        public static Dictionary<string, bool> ExemptionWeaponDictionary;
-        public static Dictionary<string, List<int>> BagSettingsDictionary;
+	public class Settings : ModSettings
+	{
 
-        public override void ExposeData() {
-            Scribe_Values.Look(ref disableAmmoUsage, "DisableAmmoUsage", false, false);
-            Scribe_Values.Look(ref hideMultipleGizmos, "HideMultipleGizmos", true, false);
-            Scribe_Values.Look(ref pawnAmmoSpawnRate, "PawnAmmoSpawnRate", 1f, false);
-            Scribe_Values.Look(ref useAmmoPerBullet, "UseAmmoPerBullet", true, false);
-            //Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
-            Scribe_Values.Look(ref useSingleLineAmmo, "UseSingleLineAmmo", false, false);
-            Scribe_Values.Look(ref useWiderGizmo, "UseWiderGizmo", false, false);
-            //Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
-            Scribe_Values.Look(ref initialAmmoString, "InitialAmmoString", "");
-            base.ExposeData();
-        }
+		private static Texture2D AmmoDisabled => ContentFinder<Texture2D>.Get("Icons/Ammo_disabled");
+		private static Texture2D AmmoEnabled => ContentFinder<Texture2D>.Get("Icons/Ammo_enabled");
 
-        public void Initialize() {
-            if (CategoryWeaponDictionary == null) {
-                CategoryWeaponDictionary = new Dictionary<string, Dictionary<string, bool>>();
-            }
-            if (ExemptionWeaponDictionary == null) {
-                ExemptionWeaponDictionary = new Dictionary<string, bool>();
-            }
-            if (BagSettingsDictionary == null) {
-                BagSettingsDictionary = new Dictionary<string, List<int>>();
-            }
-        }
-        public static ThingDef GetDefaultAmmo() {
-            if (initialAmmoString.NullOrEmpty()) {
-                initialAmmoType = AmmoLogic.AvailableAmmo.FirstOrDefault();
-                initialAmmoString = initialAmmoType.defName;
-            }
-            else {
-                initialAmmoType = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == initialAmmoString);
-            }
-            return initialAmmoType;
-        }
-        public static void Reset() {
-            disableAmmoUsage = false;
-            hideMultipleGizmos = true;
-            useAmmoPerBullet = false;
-            //useAnimalAmmo = false;
-            //useMechanoidAmmo = false;
-            useSingleLineAmmo = false;
-            useWiderGizmo = false;
-            pawnAmmoSpawnRate = 1f;
-            initialAmmoType = AmmoLogic.AvailableAmmo?.FirstOrDefault();
-            initialAmmoString = initialAmmoType.defName;
-            AmmoLogic.ResetInitialize();
-        }
+		#region Fields
 
-        public void DoWindowContents(Rect inRect) {
-            try {
-                Listing_Standard list = new Listing_Standard();
-                list.Begin(inRect);
-                if (list.ButtonText(Translate.DefaultSettings)) {
-                    Reset();
-                    changesMade = true;
-                };
-                list.Gap(2);
-                if (list.ButtonText(Translate.ChangePage)) {
-                    firstPage = !firstPage;
-                }
-                if (firstPage) {
-                    Rect rect1 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect1, Translate.PerBullet, ref useAmmoPerBullet);
-                    if (Mouse.IsOver(rect1)) {
-                        Widgets.DrawHighlight(rect1);
-                    }
-                    TooltipHandler.TipRegion(rect1, Translate.PerBulletDesc);
+		private static bool _hideMultipleGizmos = true;
+		private static float _pawnAmmoSpawnRate = 1f;
+		private static float _pawnAmmoMinSpawnRate = 0.5f;
 
-                    Rect rect2 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect2, Translate.HideMultipleGizmos, ref hideMultipleGizmos);
-                    if (Mouse.IsOver(rect2)) {
-                        Widgets.DrawHighlight(rect2);
-                    }
-                    TooltipHandler.TipRegion(rect2, Translate.HideMultipleGizmosDesc);
+		private static bool _useAmmoPerBullet;
 
-                    //Rect rect3 = list.GetRect(lineHeight);
-                    //Widgets.CheckboxLabeled(rect3, Translate.MechanoidAmmo, ref useMechanoidAmmo);
-                    //if (Mouse.IsOver(rect3)) {
-                    //    Widgets.DrawHighlight(rect3);
-                    //}
-                    //TooltipHandler.TipRegion(rect3, Translate.MechanoidAmmoDesc);
+		//private static bool useAnimalAmmo = false;
+		//private static bool useMechanoidAmmo = false;
+		private static bool _useSingleLineAmmo;
+		private static bool _useWiderGizmo;
+		private static bool _npcUseAmmo = true;
+		private static string _initialAmmoString;
+		private static AmmoCategoryDef _chosenCategory;
+		private static ThingDef _chosenKit;
+		private static bool _enable, _disable, _enableMod, _disableMod, _changesMade;
 
-                    //Rect rect4 = list.GetRect(lineHeight);
-                    //Widgets.CheckboxLabeled(rect4, Translate.AnimalAmmo, ref useAnimalAmmo);
-                    //if (Mouse.IsOver(rect4)) {
-                    //    Widgets.DrawHighlight(rect4);
-                    //}
-                    //TooltipHandler.TipRegion(rect4, Translate.AnimalAmmoDesc);
+		private static bool
+			_neolithic = true,
+			_medieval = true,
+			_industrial = true,
+			_spacer = true,
+			_ultra = true,
+			_archotech = true;
 
-                    Rect rect5 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect5, Translate.LTSUseSingleLineAmmo, ref useSingleLineAmmo);
-                    if (Mouse.IsOver(rect5)) {
-                        Widgets.DrawHighlight(rect5);
-                    }
-                    TooltipHandler.TipRegion(rect5, Translate.LTSUseSingleLineAmmoDesc);
+		private static string _searchFilter = "";
+		private Vector2 _scrollWeaponsPos;
+		private const float Margin = 4f;
+		private static readonly float _lineHeight = Text.LineHeight;
+		private static bool _firstPage = true;
 
-                    Rect rect6 = list.GetRect(lineHeight);
-                    Widgets.CheckboxLabeled(rect6, Translate.LTSUseWiderGizmo, ref useWiderGizmo);
-                    if (Mouse.IsOver(rect6)) {
-                        Widgets.DrawHighlight(rect6);
-                    }
-                    TooltipHandler.TipRegion(rect6, Translate.LTSUseWiderGizmoDesc);
+		#endregion Fields
 
 
-                    Rect rect7 = list.GetRect(lineHeight);
-                    Rect rect8 = list.GetRect(lineHeight);
-                    Widgets.Label(rect7, Translate.NPCLessAmmo((int)(pawnAmmoSpawnRate * 100)));
-                    TooltipHandler.TipRegion(rect7, Translate.AnimalAmmoDesc);
-                    pawnAmmoSpawnRate = Widgets.HorizontalSlider_NewTemp(rect8.ContractedBy(margin), pawnAmmoSpawnRate, 0.1f, 1f, true, "");
+		public static bool HideMultipleGizmos => _hideMultipleGizmos;
+		public static float PawnAmmoSpawnRate => _pawnAmmoSpawnRate;
+		public static float PawnAmmoMinSpawnRate => _pawnAmmoMinSpawnRate;
 
-                    list.GapLine(2);
-                    // Kit settings
-                    if (chosenKit == null) {
-                        chosenKit = AmmoLogic.AvailableKits.First();
-                    }
-                    if (BagSettingsDictionary.TryGetValue(chosenKit.defName, out List<int> bags)) {
-                        Widgets.Label(list.GetRect(lineHeight), Translate.AvailableKits);
-                        //Add image right half
-                        Widgets.Label(list.GetRect(lineHeight), Translate.ChangeBagDesc);
-                        Rect KitDropDown = list.GetRect(lineHeight);
-                        Widgets.Dropdown(KitDropDown.LeftHalf().LeftHalf(), chosenKit, (ThingDef selectedThing) => _ = selectedThing, GenerateKitCategoryMenu, Translate.AmmunitionCategory + chosenKit?.label);
-                        if (Widgets.ButtonText(KitDropDown.LeftHalf().RightHalf(), Translate.AddBag)) {
-                            CompProps_Kit kitProp = chosenKit.comps.FirstOrDefault(x => x is CompProps_Kit) as CompProps_Kit;
-                            if (kitProp != null) {
-                                bags.Add(kitProp.ammoCapacity.First());
-                                changesMade = true;
-                            }
-                        };
-                        list.Gap(2);
-                        for (int i = 0; i < bags.Count; i++) {
-                            int val = bags[i];
-                            string buffer = val.ToString();
-                            Rect KitRect = list.GetRect(lineHeight).LeftHalf();
-                            Rect leftPart = KitRect.LeftPartPixels(KitRect.width - 24);
-                            Rect rightPart = KitRect.RightPartPixels(24);
-                            Widgets.TextFieldNumericLabeled(leftPart, Translate.BagNumber(i + 1), ref val, ref buffer, 1, 999);
-                            if (val != bags[i]) {
-                                changesMade = true;
-                                bags[i] = val;
-                            }
-                            if (Widgets.ButtonImage(rightPart, Widgets.CheckboxOffTex, true) && bags.Count > 1) {
-                                bags.RemoveAt(i);
-                                changesMade = true;
-                            }
-                        }
-                    }
-                }
-                //Second page
-                else {
-                    if (AmmoLogic.AmmoCategoryDefs.Count() > 0) {
-                        if (chosenCategory == null) {
-                            chosenCategory = AmmoLogic.AmmoCategoryDefs.First();
-                        }
-                        Rect innerRect = list.GetRect(lineHeight);
-                        Widgets.Dropdown(innerRect.LeftHalf(), chosenCategory, (AmmoCategoryDef selectedThing) => _ = selectedThing, GenerateAmmoCategoryMenu, Translate.AmmunitionCategory + chosenCategory?.label);
-                        Widgets.Label(innerRect.RightHalf().ContractedBy(margin, 0f), Translate.AvailableAmmoCategory);
-                        Rect AmmoRect = list.GetRect(lineHeight * 2f);
-                        Rect TextRect = list.GetRect(lineHeight * 1f);
-                        for (int i = 0; i < chosenCategory.ammoDefs.Count; i++) {
-                            ThingDef tempDef = DefDatabase<ThingDef>.GetNamed(chosenCategory.ammoDefs[i]);
-                            Rect tempRect = new Rect((AmmoRect.x + (float)(i * lineHeight * 2f)), AmmoRect.y, lineHeight * 2, lineHeight * 2);
-                            if (Widgets.ButtonImage(tempRect, (Texture2D)tempDef.graphic.MatSingle.mainTexture)) {
-                                initialAmmoType = tempDef;
-                                initialAmmoString = tempDef.defName;
-                            }
-                            if (initialAmmoType == tempDef) {
-                                Widgets.DrawTextureFitted(tempRect, Widgets.CheckboxOnTex, 1);
-                                Widgets.LabelFit(tempRect, Translate.SelectedStandardAmmo);
-                            }
-                            if (Mouse.IsOver(tempRect)) {
-                                float tempY = TextRect.y;
-                                Widgets.DrawHighlight(tempRect);
-                                Widgets.Label(TextRect.x + (float)(i * lineHeight), ref tempY, lineHeight * 10, tempDef.label);
-                            }
-                        }
-                        list.GapLine(12f);
-                        //Filter buttons
-                        Rect settings1 = list.GetRect(lineHeight);
-                        if (Widgets.ButtonText(settings1.LeftHalf(), Translate.DefaultAssociation)) {
-                            AmmoLogic.ResetInitialize();
-                            changesMade = true;
-                        }
-                        Rect settings2 = list.GetRect(lineHeight);
-                        if (Widgets.ButtonText(settings2.LeftHalf(), Translate.Enable)) {
-                            enable = true;
-                        }
-                        if (Widgets.ButtonText(settings2.RightHalf(), Translate.Disable)) {
-                            disable = true;
-                        }
-                        Rect settings3 = list.GetRect(lineHeight);
-                        if (Widgets.ButtonText(settings3.LeftHalf(), Translate.EnableMod)) {
-                            enableMod = true;
-                        }
-                        if (Widgets.ButtonText(settings3.RightHalf(), Translate.DisableMod)) {
-                            disableMod = true;
-                        }
-                        //Main
-                        Rect optionsRect = list.GetRect((lineHeight * 12f) - margin * 2);
-                        Widgets.DrawMenuSection(optionsRect);
-                        float yPos = optionsRect.y + margin;
-                        float xPos = optionsRect.x + margin;
-                        Rect filterRect = optionsRect.LeftPartPixels(250);
-                        Rect WeaponsInRect = optionsRect.RightPartPixels(optionsRect.width - 250);
-                        TextAnchor tempAnchor = Text.Anchor;
-                        Text.Anchor = TextAnchor.MiddleCenter;
-                        Widgets.Label(filterRect.TopHalf().TopHalf().TopHalf().ContractedBy(4), Translate.Filter);
-                        Text.Anchor = tempAnchor;
-                        //Search
-                        SearchFilter = Widgets.TextField(filterRect.TopHalf().TopHalf().BottomHalf().ContractedBy(2), SearchFilter);
-                        Widgets.CheckboxLabeled(filterRect.TopHalf().BottomHalf().TopHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)2), ref Neolithic);
-                        Widgets.CheckboxLabeled(filterRect.TopHalf().BottomHalf().BottomHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)3), ref Medieval);
-                        Widgets.CheckboxLabeled(filterRect.BottomHalf().TopHalf().TopHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)4), ref Industrial);
-                        Widgets.CheckboxLabeled(filterRect.BottomHalf().TopHalf().BottomHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)5), ref Spacer);
-                        Widgets.CheckboxLabeled(filterRect.BottomHalf().BottomHalf().TopHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)6), ref Ultra);
-                        Widgets.CheckboxLabeled(filterRect.BottomHalf().BottomHalf().BottomHalf().ContractedBy(2), TechLevelUtility.ToStringHuman((TechLevel)7), ref Archotech);
-                        Widgets.DrawMenuSection(WeaponsInRect);
-                        Rect WeaponsOutRect = new Rect(WeaponsInRect.ContractedBy(margin));
-                        float num2 = ((AmmoLogic.AvailableProjectileWeapons.Where(x =>
-                        (x.techLevel == TechLevel.Neolithic && Neolithic) ||
-                        (x.techLevel == TechLevel.Medieval && Medieval) ||
-                        (x.techLevel == TechLevel.Industrial && Industrial) ||
-                        (x.techLevel == TechLevel.Spacer && Spacer) ||
-                        (x.techLevel == TechLevel.Ultra && Ultra) ||
-                        (x.techLevel == TechLevel.Archotech && Archotech)
-                        ).Count() * (lineHeight)));
-                        if (num2 < WeaponsOutRect.height) {
-                            num2 = WeaponsOutRect.height;
-                        }
-                        //Weapons
-                        Rect WeaponsViewRect = new Rect(0f, 0f, WeaponsOutRect.width - margin * 4, num2);
-                        Widgets.BeginScrollView(WeaponsOutRect, ref this.scrollWeaponsPos, WeaponsViewRect, true);
-                        Listing_Standard WeaponsList = new Listing_Standard(WeaponsInRect, () => this.scrollWeaponsPos);
-                        WeaponsList.Begin(WeaponsViewRect);
-                        foreach (ThingDef thingDef in AmmoLogic.AvailableProjectileWeapons) {
-                            if (thingDef.label.ToLower().Contains(SearchFilter.ToLower())) {
-                                switch (thingDef.techLevel) {
-                                    case TechLevel.Neolithic:
-                                        if (!Neolithic) {
-                                            continue;
-                                        }
-                                        break;
-                                    case TechLevel.Medieval:
-                                        if (!Medieval) {
-                                            continue;
-                                        }
-                                        break;
-                                    case TechLevel.Industrial:
-                                        if (!Industrial) {
-                                            continue;
-                                        }
-                                        break;
-                                    case TechLevel.Spacer:
-                                        if (!Spacer) {
-                                            continue;
-                                        }
-                                        break;
-                                    case TechLevel.Ultra:
-                                        if (!Ultra) {
-                                            continue;
-                                        }
-                                        break;
-                                    case TechLevel.Archotech:
-                                        if (!Archotech) {
-                                            continue;
-                                        }
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                Rect weaponRect = WeaponsList.GetRect(lineHeight);
-                                Rect iconRect = weaponRect.LeftPartPixels(25);
-                                Rect mainWeaponRect = weaponRect.LeftPartPixels(weaponRect.width - 50);
-                                mainWeaponRect.x += 25;
-                                Rect subWeaponRect = weaponRect.RightPartPixels(25f);
-                                Widgets.DrawTextureFitted(iconRect, Widgets.GetIconFor(thingDef), 0.95f);
-                                CategoryWeaponDictionary.TryGetValue(chosenCategory.defName, out Dictionary<string, bool> dic);
-                                dic.TryGetValue(thingDef.defName, out bool res);
-                                ExemptionWeaponDictionary.TryGetValue(thingDef.defName, out bool exemption);
-                                bool val = res;
-                                bool val2 = exemption;
-                                if (enable) {
-                                    dic.SetOrAdd(thingDef.defName, true);
-                                    changesMade = true;
-                                }
-                                if (disable) {
-                                    dic.SetOrAdd(thingDef.defName, false);
-                                    changesMade = true;
-                                }
-                                if (enableMod) {
-                                    ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, false);
-                                    changesMade = true;
-                                }
-                                if (disableMod) {
-                                    ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, true);
-                                    changesMade = true;
-                                }
-                                Widgets.DrawHighlightIfMouseover(weaponRect);
-                                TooltipHandler.TipRegion(mainWeaponRect, thingDef.description + "\n\n" + Translate.UseAmmo(chosenCategory.label));
-                                Widgets.CheckboxLabeled(mainWeaponRect, " " + thingDef.LabelCap, ref val, false);
-                                if (val != res) {
-                                    dic.SetOrAdd(thingDef.defName, val);
-                                    AmmoLogic.ResetHyperLinksForWeapon(thingDef);
-                                    changesMade = true;
-                                }
-                                TooltipHandler.TipRegion(subWeaponRect, Translate.ExemptWeapon);
-                                Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false, Ammo_Disabled, Ammo_Enabled);
-                                if (val2 != exemption) {
-                                    ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, val2);
-                                    AmmoLogic.ResetHyperLinksForWeapon(thingDef);
-                                    changesMade = true;
-                                }
-                            }
-                        }
-                        WeaponsList.End();
-                        Widgets.EndScrollView();
-                        disable = false;
-                        enable = false;
-                        disableMod = false;
-                        enableMod = false;
-                    }
-                    else {
-                        list.Label(Translate.NoAmmoCategories);
-                    }
-                }
-                if (changesMade) {
-                    AmmoLogic.Save();
-                    changesMade = false;
-                }
-                list.End();
-                Write();
-            }
-            catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-        public static IEnumerable<Widgets.DropdownMenuElement<AmmoCategoryDef>> GenerateAmmoCategoryMenu(AmmoCategoryDef def) {
-            List<AmmoCategoryDef>.Enumerator enumerator = AmmoLogic.AmmoCategoryDefs.ToList().GetEnumerator();
-            while (enumerator.MoveNext()) {
-                AmmoCategoryDef ammo = enumerator.Current;
-                yield return new Widgets.DropdownMenuElement<AmmoCategoryDef> {
-                    option = new FloatMenuOption(ammo.label, delegate () { chosenCategory = ammo; }, MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
-                    payload = ammo,
-                };
-            }
-            yield break;
-        }
-        public static IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateKitCategoryMenu(ThingDef def) {
-            List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableKits.ToList().GetEnumerator();
-            while (enumerator.MoveNext()) {
-                ThingDef kit = enumerator.Current;
-                yield return new Widgets.DropdownMenuElement<ThingDef> {
-                    option = new FloatMenuOption(kit.label, delegate () { chosenKit = kit; }, MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
-                    payload = kit,
-                };
-            }
-            yield break;
-        }
-    }
+		public static bool UseAmmoPerBullet => _useAmmoPerBullet;
+
+		//public static bool UseAnimalAmmo => useAnimalAmmo;
+		//public static bool UseMechanoidAmmo => useMechanoidAmmo;
+		public static bool UseSingleLineAmmo => _useSingleLineAmmo;
+		public static bool UseWiderGizmo => _useWiderGizmo;
+		public static bool NpcUseAmmo => _npcUseAmmo;
+		public static ThingDef InitialAmmoType { get; private set; }
+
+		public static Dictionary<string, Dictionary<string, bool>> CategoryWeaponDictionary;
+		public static Dictionary<string, bool> ExemptionWeaponDictionary;
+		public static Dictionary<string, List<int>> BagSettingsDictionary;
+
+		public override void ExposeData()
+		{
+			Scribe_Values.Look(ref _hideMultipleGizmos, "HideMultipleGizmos", true);
+			Scribe_Values.Look(ref _pawnAmmoSpawnRate, "PawnAmmoSpawnRate", 1f);
+			Scribe_Values.Look(ref _pawnAmmoMinSpawnRate, "PawnAmmoMinSpawnRate", 0.5f);
+			Scribe_Values.Look(ref _useAmmoPerBullet, "UseAmmoPerBullet", true);
+			//Scribe_Values.Look(ref useMechanoidAmmo, "UseMechanoidAmmo", false, false);
+			Scribe_Values.Look(ref _useSingleLineAmmo, "UseSingleLineAmmo");
+			Scribe_Values.Look(ref _useWiderGizmo, "UseWiderGizmo");
+			Scribe_Values.Look(ref _npcUseAmmo, "NpcUseAmmo", true);
+			//Scribe_Values.Look(ref useAnimalAmmo, "UseAnimalAmmo", false, false);
+			Scribe_Values.Look(ref _initialAmmoString, "InitialAmmoString", "");
+			base.ExposeData();
+		}
+
+		public static void Initialize()
+		{
+			if (CategoryWeaponDictionary == null)
+			{
+				CategoryWeaponDictionary = new Dictionary<string, Dictionary<string, bool>>();
+			}
+
+			if (ExemptionWeaponDictionary == null)
+			{
+				ExemptionWeaponDictionary = new Dictionary<string, bool>();
+			}
+
+			if (BagSettingsDictionary == null)
+			{
+				BagSettingsDictionary = new Dictionary<string, List<int>>();
+			}
+		}
+
+		public static ThingDef GetDefaultAmmo()
+		{
+			if (_initialAmmoString.NullOrEmpty())
+			{
+				InitialAmmoType = AmmoLogic.AvailableAmmo.FirstOrDefault();
+				if (InitialAmmoType != null)
+				{
+					_initialAmmoString = InitialAmmoType.defName;
+				}
+			}
+			else
+			{
+				InitialAmmoType = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == _initialAmmoString);
+			}
+
+			return InitialAmmoType;
+		}
+
+		private static void Reset()
+		{
+			_hideMultipleGizmos = true;
+			_useAmmoPerBullet = false;
+			//useAnimalAmmo = false;
+			//useMechanoidAmmo = false;
+			_useSingleLineAmmo = false;
+			_useWiderGizmo = false;
+			_npcUseAmmo = true;
+			_pawnAmmoSpawnRate = 1f;
+			_pawnAmmoMinSpawnRate = 0.5f;
+			InitialAmmoType = AmmoLogic.AvailableAmmo?.FirstOrDefault();
+			if (InitialAmmoType != null)
+			{
+				_initialAmmoString = InitialAmmoType.defName;
+			}
+
+			AmmoLogic.ResetInitialize();
+		}
+
+		public void DoWindowContents(Rect inRect)
+		{
+			try
+			{
+				var list = new Listing_Standard();
+				list.Begin(inRect);
+				if (list.ButtonText(Translate.DefaultSettings))
+				{
+					Reset();
+					_changesMade = true;
+				}
+
+				list.Gap(2);
+				if (list.ButtonText(Translate.ChangePage))
+				{
+					_firstPage = !_firstPage;
+				}
+
+				if (_firstPage)
+				{
+					Rect rect1 = list.GetRect(_lineHeight);
+					Widgets.CheckboxLabeled(rect1, Translate.PerBullet, ref _useAmmoPerBullet);
+					if (Mouse.IsOver(rect1))
+					{
+						Widgets.DrawHighlight(rect1);
+					}
+
+					TooltipHandler.TipRegion(rect1, Translate.PerBulletDesc);
+
+					Rect rect2 = list.GetRect(_lineHeight);
+					Widgets.CheckboxLabeled(rect2, Translate.HideMultipleGizmos, ref _hideMultipleGizmos);
+					if (Mouse.IsOver(rect2))
+					{
+						Widgets.DrawHighlight(rect2);
+					}
+
+					TooltipHandler.TipRegion(rect2, Translate.HideMultipleGizmosDesc);
+
+					//Rect rect3 = list.GetRect(lineHeight);
+					//Widgets.CheckboxLabeled(rect3, Translate.MechanoidAmmo, ref useMechanoidAmmo);
+					//if (Mouse.IsOver(rect3)) {
+					//    Widgets.DrawHighlight(rect3);
+					//}
+					//TooltipHandler.TipRegion(rect3, Translate.MechanoidAmmoDesc);
+
+					//Rect rect4 = list.GetRect(lineHeight);
+					//Widgets.CheckboxLabeled(rect4, Translate.AnimalAmmo, ref useAnimalAmmo);
+					//if (Mouse.IsOver(rect4)) {
+					//    Widgets.DrawHighlight(rect4);
+					//}
+					//TooltipHandler.TipRegion(rect4, Translate.AnimalAmmoDesc);
+
+					Rect rect5 = list.GetRect(_lineHeight);
+					Widgets.CheckboxLabeled(rect5, Translate.LtsUseSingleLineAmmo, ref _useSingleLineAmmo);
+					if (Mouse.IsOver(rect5))
+					{
+						Widgets.DrawHighlight(rect5);
+					}
+
+					TooltipHandler.TipRegion(rect5, Translate.LtsUseSingleLineAmmoDesc);
+
+					Rect rect6 = list.GetRect(_lineHeight);
+					Widgets.CheckboxLabeled(rect6, Translate.LtsUseWiderGizmo, ref _useWiderGizmo);
+					if (Mouse.IsOver(rect6))
+					{
+						Widgets.DrawHighlight(rect6);
+					}
+
+					TooltipHandler.TipRegion(rect6, Translate.LtsUseWiderGizmoDesc);
+					
+					Rect rect7 = list.GetRect(_lineHeight);
+					Widgets.CheckboxLabeled(rect7, Translate.NpcUseAmmo, ref _npcUseAmmo);
+					if (Mouse.IsOver(rect7))
+					{
+						Widgets.DrawHighlight(rect7);
+					}
+
+					TooltipHandler.TipRegion(rect7, Translate.NpcUseAmmoDesc);
+
+
+					Rect rect8 = list.GetRect(_lineHeight);
+					Rect rect9 = list.GetRect(_lineHeight);
+					Widgets.Label(rect8, Translate.NpcMaxAmmo((int)(_pawnAmmoSpawnRate * 100)));
+					TooltipHandler.TipRegion(rect8, Translate.NpcMaxAmmoDesc);
+					_pawnAmmoSpawnRate = Widgets.HorizontalSlider_NewTemp(rect9.ContractedBy(Margin),
+						_pawnAmmoSpawnRate,
+						_pawnAmmoMinSpawnRate, 1f, true, "");
+					
+					Rect rect10 = list.GetRect(_lineHeight);
+					Rect rect11 = list.GetRect(_lineHeight);
+					Widgets.Label(rect10, Translate.NpcMinAmmo((int)(_pawnAmmoMinSpawnRate * 100)));
+					TooltipHandler.TipRegion(rect10, Translate.NpcMinAmmoDesc);
+					_pawnAmmoMinSpawnRate = Widgets.HorizontalSlider_NewTemp(rect11.ContractedBy(Margin),
+						_pawnAmmoMinSpawnRate,
+						0.1f, _pawnAmmoSpawnRate, true, "");
+					
+
+					list.GapLine(2);
+					// Kit settings
+					if (_chosenKit == null)
+					{
+						_chosenKit = AmmoLogic.AvailableKits.First();
+					}
+
+					if (BagSettingsDictionary.TryGetValue(_chosenKit.defName, out List<int> bags))
+					{
+						Widgets.Label(list.GetRect(_lineHeight), Translate.AvailableKits);
+						//Add image right half
+						Widgets.Label(list.GetRect(_lineHeight), Translate.ChangeBagDesc);
+						Rect kitDropDown = list.GetRect(_lineHeight);
+						Widgets.Dropdown(kitDropDown.LeftHalf().LeftHalf(), _chosenKit,
+							(selectedThing) => _ = selectedThing, GenerateKitCategoryMenu,
+							Translate.AmmunitionCategory + _chosenKit?.label);
+
+						if (Widgets.ButtonText(kitDropDown.LeftHalf().RightHalf(), Translate.AddBag))
+						{
+							if (_chosenKit?.comps.FirstOrDefault(x => x is CompProps_Kit) is CompProps_Kit kitProp)
+							{
+								bags.Add(kitProp.ammoCapacity.First());
+								_changesMade = true;
+							}
+						}
+
+						list.Gap(2);
+						for (int i = 0; i < bags.Count; i++)
+						{
+							int val = bags[i];
+							string buffer = val.ToString();
+							Rect kitRect = list.GetRect(_lineHeight).LeftHalf();
+							Rect leftPart = kitRect.LeftPartPixels(kitRect.width - 24);
+							Rect rightPart = kitRect.RightPartPixels(24);
+							Widgets.TextFieldNumericLabeled(leftPart, Translate.BagNumber(i + 1), ref val, ref buffer,
+								1, 999);
+
+							if (val != bags[i])
+							{
+								_changesMade = true;
+								bags[i] = val;
+							}
+
+							if (Widgets.ButtonImage(rightPart, Widgets.CheckboxOffTex) && bags.Count > 1)
+							{
+								bags.RemoveAt(i);
+								_changesMade = true;
+							}
+						}
+					}
+				}
+				//Second page
+				else
+				{
+					if (AmmoLogic.AmmoCategoryDefs.Any())
+					{
+						if (_chosenCategory == null)
+						{
+							_chosenCategory = AmmoLogic.AmmoCategoryDefs.First();
+						}
+
+						Rect innerRect = list.GetRect(_lineHeight);
+						Widgets.Dropdown(innerRect.LeftHalf(), _chosenCategory,
+							selectedThing => _ = selectedThing, GenerateAmmoCategoryMenu,
+							Translate.AmmunitionCategory + _chosenCategory?.label);
+
+						Widgets.Label(innerRect.RightHalf().ContractedBy(Margin, 0f), Translate.AvailableAmmoCategory);
+						Rect ammoRect = list.GetRect(_lineHeight * 2f);
+						Rect textRect = list.GetRect(_lineHeight * 1f);
+						for (int i = 0; i < _chosenCategory.ammoDefs.Count; i++)
+						{
+							ThingDef tempDef = DefDatabase<ThingDef>.GetNamed(_chosenCategory.ammoDefs[i]);
+							var tempRect = new Rect((ammoRect.x + i * _lineHeight * 2f), ammoRect.y,
+								_lineHeight * 2, _lineHeight * 2);
+
+							if (Widgets.ButtonImage(tempRect, (Texture2D)tempDef.graphic.MatSingle.mainTexture))
+							{
+								InitialAmmoType = tempDef;
+								_initialAmmoString = tempDef.defName;
+							}
+
+							if (InitialAmmoType == tempDef)
+							{
+								Widgets.DrawTextureFitted(tempRect, Widgets.CheckboxOnTex, 1);
+								Widgets.LabelFit(tempRect, Translate.SelectedStandardAmmo);
+							}
+
+							if (!Mouse.IsOver(tempRect))
+							{
+								continue;
+							}
+
+							float tempY = textRect.y;
+							Widgets.DrawHighlight(tempRect);
+							Widgets.Label(textRect.x + i * _lineHeight, ref tempY, _lineHeight * 10,
+								tempDef.label);
+						}
+
+						list.GapLine();
+						//Filter buttons
+						Rect settings1 = list.GetRect(_lineHeight);
+						if (Widgets.ButtonText(settings1.LeftHalf(), Translate.DefaultAssociation))
+						{
+							AmmoLogic.ResetInitialize();
+							_changesMade = true;
+						}
+
+						Rect settings2 = list.GetRect(_lineHeight);
+						if (Widgets.ButtonText(settings2.LeftHalf(), Translate.Enable))
+						{
+							_enable = true;
+						}
+
+						if (Widgets.ButtonText(settings2.RightHalf(), Translate.Disable))
+						{
+							_disable = true;
+						}
+
+						Rect settings3 = list.GetRect(_lineHeight);
+						if (Widgets.ButtonText(settings3.LeftHalf(), Translate.EnableMod))
+						{
+							_enableMod = true;
+						}
+
+						if (Widgets.ButtonText(settings3.RightHalf(), Translate.DisableMod))
+						{
+							_disableMod = true;
+						}
+
+						//Main
+						Rect optionsRect = list.GetRect((_lineHeight * 12f) - Margin * 2);
+						Widgets.DrawMenuSection(optionsRect);
+						Rect filterRect = optionsRect.LeftPartPixels(250);
+						Rect weaponsInRect = optionsRect.RightPartPixels(optionsRect.width - 250);
+						TextAnchor tempAnchor = Text.Anchor;
+						Text.Anchor = TextAnchor.MiddleCenter;
+						Widgets.Label(filterRect.TopHalf().TopHalf().TopHalf().ContractedBy(4), Translate.Filter);
+						Text.Anchor = tempAnchor;
+						//Search
+						_searchFilter = Widgets.TextField(filterRect.TopHalf().TopHalf().BottomHalf().ContractedBy(2),
+							_searchFilter);
+
+						Widgets.CheckboxLabeled(filterRect.TopHalf().BottomHalf().TopHalf().ContractedBy(2),
+							((TechLevel)2).ToStringHuman(), ref _neolithic);
+
+						Widgets.CheckboxLabeled(filterRect.TopHalf().BottomHalf().BottomHalf().ContractedBy(2),
+							((TechLevel)3).ToStringHuman(), ref _medieval);
+
+						Widgets.CheckboxLabeled(filterRect.BottomHalf().TopHalf().TopHalf().ContractedBy(2),
+							((TechLevel)4).ToStringHuman(), ref _industrial);
+
+						Widgets.CheckboxLabeled(filterRect.BottomHalf().TopHalf().BottomHalf().ContractedBy(2),
+							((TechLevel)5).ToStringHuman(), ref _spacer);
+
+						Widgets.CheckboxLabeled(filterRect.BottomHalf().BottomHalf().TopHalf().ContractedBy(2),
+							((TechLevel)6).ToStringHuman(), ref _ultra);
+
+						Widgets.CheckboxLabeled(filterRect.BottomHalf().BottomHalf().BottomHalf().ContractedBy(2),
+							((TechLevel)7).ToStringHuman(), ref _archotech);
+
+						Widgets.DrawMenuSection(weaponsInRect);
+						var weaponsOutRect = new Rect(weaponsInRect.ContractedBy(Margin));
+						float num2 = ((AmmoLogic.AvailableProjectileWeapons.Count(x =>
+							               (x.techLevel == TechLevel.Neolithic && _neolithic) ||
+							               (x.techLevel == TechLevel.Medieval && _medieval) ||
+							               (x.techLevel == TechLevel.Industrial && _industrial) ||
+							               (x.techLevel == TechLevel.Spacer && _spacer) ||
+							               (x.techLevel == TechLevel.Ultra && _ultra) ||
+							               (x.techLevel == TechLevel.Archotech && _archotech)) *
+						               (_lineHeight)));
+
+						if (num2 < weaponsOutRect.height)
+						{
+							num2 = weaponsOutRect.height;
+						}
+
+						//Weapons
+						var weaponsViewRect = new Rect(0f, 0f, weaponsOutRect.width - Margin * 4, num2);
+						Widgets.BeginScrollView(weaponsOutRect, ref _scrollWeaponsPos, weaponsViewRect);
+						var weaponsList = new Listing_Standard(weaponsInRect, () => _scrollWeaponsPos);
+						weaponsList.Begin(weaponsViewRect);
+						foreach (ThingDef thingDef in AmmoLogic.AvailableProjectileWeapons.Where(thingDef =>
+							         thingDef.label.ToLower().Contains(_searchFilter.ToLower())))
+						{
+							switch (thingDef.techLevel)
+							{
+								case TechLevel.Neolithic:
+									if (!_neolithic)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Medieval:
+									if (!_medieval)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Industrial:
+									if (!_industrial)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Spacer:
+									if (!_spacer)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Ultra:
+									if (!_ultra)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Archotech:
+									if (!_archotech)
+									{
+										continue;
+									}
+
+									break;
+
+
+								case TechLevel.Undefined:
+								case TechLevel.Animal:
+								default:
+									break;
+							}
+
+							Rect weaponRect = weaponsList.GetRect(_lineHeight);
+							Rect iconRect = weaponRect.LeftPartPixels(25);
+							Rect mainWeaponRect = weaponRect.LeftPartPixels(weaponRect.width - 50);
+							mainWeaponRect.x += 25;
+							Rect subWeaponRect = weaponRect.RightPartPixels(25f);
+							Widgets.DrawTextureFitted(iconRect, Widgets.GetIconFor(thingDef), 0.95f);
+							CategoryWeaponDictionary.TryGetValue(_chosenCategory.defName,
+								out Dictionary<string, bool> dic);
+
+							dic.TryGetValue(thingDef.defName, out bool res);
+							ExemptionWeaponDictionary.TryGetValue(thingDef.defName, out bool exemption);
+							bool val = res;
+							bool val2 = exemption;
+							if (_enable)
+							{
+								dic.SetOrAdd(thingDef.defName, true);
+								_changesMade = true;
+							}
+
+							if (_disable)
+							{
+								dic.SetOrAdd(thingDef.defName, false);
+								_changesMade = true;
+							}
+
+							if (_enableMod)
+							{
+								ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, false);
+								_changesMade = true;
+							}
+
+							if (_disableMod)
+							{
+								ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, true);
+								_changesMade = true;
+							}
+
+							Widgets.DrawHighlightIfMouseover(weaponRect);
+							TooltipHandler.TipRegion(mainWeaponRect,
+								thingDef.description + "\n\n" + Translate.UseAmmo(_chosenCategory.label));
+
+							Widgets.CheckboxLabeled(mainWeaponRect, " " + thingDef.LabelCap, ref val);
+							if (val != res)
+							{
+								dic.SetOrAdd(thingDef.defName, val);
+								AmmoLogic.ResetHyperLinksForWeapon(thingDef);
+								_changesMade = true;
+							}
+
+							TooltipHandler.TipRegion(subWeaponRect, Translate.ExemptWeapon);
+							Widgets.Checkbox(subWeaponRect.x, subWeaponRect.y, ref val2, 24, false, false,
+								AmmoDisabled, AmmoEnabled);
+
+							if (val2 == exemption)
+							{
+								continue;
+							}
+
+							ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, val2);
+							AmmoLogic.ResetHyperLinksForWeapon(thingDef);
+							_changesMade = true;
+						}
+
+						weaponsList.End();
+						Widgets.EndScrollView();
+						_disable = false;
+						_enable = false;
+						_disableMod = false;
+						_enableMod = false;
+					}
+					else
+					{
+						list.Label(Translate.NoAmmoCategories);
+					}
+				}
+
+				if (_changesMade)
+				{
+					AmmoLogic.Save();
+					_changesMade = false;
+				}
+
+				list.End();
+				this.Write();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.Message);
+			}
+		}
+
+		private static IEnumerable<Widgets.DropdownMenuElement<AmmoCategoryDef>> GenerateAmmoCategoryMenu(
+			AmmoCategoryDef def)
+		{
+			using (List<AmmoCategoryDef>.Enumerator enumerator = AmmoLogic.AmmoCategoryDefs.ToList().GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					AmmoCategoryDef ammo = enumerator.Current;
+					yield return new Widgets.DropdownMenuElement<AmmoCategoryDef>
+					{
+						option = new FloatMenuOption(ammo?.label, delegate { _chosenCategory = ammo; }), payload = ammo
+					};
+				}
+			}
+		}
+
+		private static IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateKitCategoryMenu(ThingDef def)
+		{
+			using (List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableKits.ToList().GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					ThingDef kit = enumerator.Current;
+					yield return new Widgets.DropdownMenuElement<ThingDef>
+					{
+						option = new FloatMenuOption(kit?.label, delegate { _chosenKit = kit; }), payload = kit
+					};
+				}
+			}
+		}
+	}
 }

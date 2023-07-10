@@ -25,8 +25,12 @@
     <LTSUseSingleLineAmmo>One per column gizmo</LTSUseSingleLineAmmo>
     <LTSUseSingleLineAmmoDesc>Whether ammunition gizmo fills the entire gizmo(true) or is split in two rows to save space(false)</LTSUseSingleLineAmmoDesc>
     <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
-    <LTSNPCLessAmmo>pawn ammo spawn multiplier: {0}%.</LTSNPCLessAmmo>
-    <LTSNPCLessAmmoDesc>The percentage amount to reduce after having assigned and given ammo to a newly spawned pawn.</LTSNPCLessAmmoDesc>
+    <LTSNpcMaxAmmo>Pawn maximum ammo spawn: {0}%.</LTSNpcMaxAmmo>
+    <LTSNpcMaxAmmoDesc>The maximum amount of ammo a pawn can spawn with in their kit.</LTSNpcMaxAmmoDesc>
+    <LTSNpcMinAmmo>Pawn minimum ammo spawn: {0}%.</LTSNpcMinAmmo>
+    <LTSNpcMinAmmoDesc>The minimum amount of ammo a pawn can spawn with in their kit.</LTSNpcMinAmmoDesc>
+    <LTSNpcUseAmmo>Non-colonists use ammo?</LTSNpcUseAmmo>
+    <LTSNpcUseAmmoDesc>If checked true, enemies and guests will consume ammo upon using their ranged weapons. If false, they don't consume any ammunition. (Do note, they will still need at least 1 ammo which can thus last indefinitely.)</LTSNpcUseAmmoDesc>
     <LTSPerBullet>Ammo per bullet</LTSPerBullet>
     <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
     <LTSSelectedStandardAmmo>Default</LTSSelectedStandardAmmo>

@@ -1,7 +1,19 @@
 ﻿[LTS]Ammunition - Framework
-2023-
-    - Fixed issue with pawns trying to fire without ammo when using per bullet mode.
+2023-07-02
+    - Fixed projectiles not changing bullets depending on ammo properly.
+    - Added ultratech ammo type.
+    - Fixed job not ending properly when out of ammo.
+
+2023-07-01
+    - Added min-max slider spawn ammo rate for pawns with kits.
+    - Added option to allow non-colonists to fire indefinitely without consuming ammo.
+    - Dropping 1.3 support, 1.3 uses 1.4 defs and code so might cause issues, might not. Who knows? Tynan knows.
+
+2023-06-30
+    - Fixed pawns trying to fire without ammo.
     - Fixed issue where spawned children spawned with kits they can't wear.
+    - Fixed issue with kits not being able to switch ammo type.
+    - Undressed pawns now drop ammo in their kits.
 
 2022-12-26
     - Weapons show in their description what ammo they can use with hyperlinks.

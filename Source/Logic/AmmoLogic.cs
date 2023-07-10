@@ -52,6 +52,7 @@ namespace Ammunition.Logic
 		private static readonly List<ThingDef> _explosiveAmmo = new List<ThingDef>();
 		private static readonly List<ThingDef> _spacerAmmo = new List<ThingDef>();
 		private static readonly List<ThingDef> _archotechAmmo = new List<ThingDef>();
+		private static readonly List<ThingDef> _ultratechAmmo = new List<ThingDef>();
 
 		public static bool HaveAmmo = true;
 
@@ -84,7 +85,7 @@ namespace Ammunition.Logic
 
 
 				case TechLevel.Ultra:
-					return category == AmmoTypes.Spacer;
+					return category == AmmoTypes.Ultratech;
 
 
 				case TechLevel.Archotech:
@@ -122,6 +123,10 @@ namespace Ammunition.Logic
 
 				case AmmoTypes.Spacer:
 					return _spacerAmmo;
+
+
+				case AmmoTypes.Ultratech:
+					return _ultratechAmmo;
 
 
 				case AmmoTypes.Archotech:
@@ -192,14 +197,31 @@ namespace Ammunition.Logic
 
 			foreach (Kit kit in kits)
 			{
-				foreach (Bag t in kit.KitComp.Bags.Where(t => t.Count > 0))
-				{
-					DebugThingPlaceHelper.DebugSpawn(t.ChosenAmmo,
-						kit.SpawnedParentOrMe.PositionHeld, t.Count);
-
-					t.Count = 0;
-				}
+				EmptyKitAt(kit.KitComp, kit.SpawnedParentOrMe.PositionHeld);
 			}
+		}
+
+		public static void EmptyKitAt(KitComponent kit, IntVec3 pos)
+		{
+			foreach (Bag t in kit.Bags)
+			{
+				EmptyBagAt(t, pos);
+			}
+		}
+
+		public static void EmptyBagAt(Bag bag, IntVec3 pos)
+		{
+			if (bag.Count < 1)
+			{
+				return;
+			}
+
+			Thing ammo = ThingMaker.MakeThing(bag.ChosenAmmo);
+			ammo.stackCount = bag.Count;
+			GenPlace.TryPlaceThing(ammo, pos, Find.CurrentMap,
+				ThingPlaceMode.Near);
+
+			bag.Count = 0;
 		}
 
 		private static void LoadSpawnedKit(Kit apparel, AmmoCategoryDef def, Pawn pawn = null)
@@ -212,7 +234,8 @@ namespace Ammunition.Logic
 				{
 					apparel.KitComp.Bags[i].MaxCount = apparel.KitComp.Props.ammoCapacity[i];
 					apparel.KitComp.Bags[i].Count =
-						(int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] / 3,
+						(int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] *
+						                 Settings.Settings.PawnAmmoMinSpawnRate,
 							      apparel.KitComp.Props.ammoCapacity[i]) *
 						      Settings.Settings.PawnAmmoSpawnRate);
 
@@ -343,6 +366,7 @@ namespace Ammunition.Logic
 		{
 			try
 			{
+				bool changes = false;
 				if (load)
 				{
 					Load();
@@ -356,9 +380,10 @@ namespace Ammunition.Logic
 					Log.Error("There are no ammo mods installed, only the framework!");
 					return;
 				}
-
+				
 				foreach (AmmoCategoryDef category in AmmoCategoryDefs)
 				{
+					//Create a dictionary for fast tracking of what ammo is in what category.
 					foreach (string ammoStringDef in from ammoStringDef in category.ammoDefs
 					         let ammoDef = AvailableAmmo.FirstOrDefault(x => x.defName == ammoStringDef)
 					         where ammoDef != null
@@ -376,6 +401,7 @@ namespace Ammunition.Logic
 					{
 						Settings.Settings.CategoryWeaponDictionary.Add(category.defName,
 							new Dictionary<string, bool>());
+						changes = true;
 					}
 
 					Settings.Settings.CategoryWeaponDictionary.TryGetValue(category.defName,
@@ -385,24 +411,61 @@ namespace Ammunition.Logic
 					{
 						Settings.Settings.CategoryWeaponDictionary.SetOrAdd(category.defName,
 							new Dictionary<string, bool>());
+						changes = true;
 					}
-
+					
 					foreach (ThingDef weapon in AvailableProjectileWeapons)
 					{
-						if (dic != null && !dic.ContainsKey(weapon.defName))
+						if (dic == null || dic.ContainsKey(weapon.defName))
 						{
-							bool assigned = (category.includeWeaponDefs.Contains(weapon.defName) ||
-							                 (category.autoAssignable &&
-							                  TechLevelEqualCategory(weapon.techLevel, category.ammoType)));
-
-							dic.Add(weapon.defName, assigned && !category.excludeWeaponDefs.Contains(weapon.defName));
+							continue;
 						}
 
-						if (!Settings.Settings.ExemptionWeaponDictionary.ContainsKey(weapon.defName))
+						bool assigned = (category.includeWeaponDefs.Contains(weapon.defName) ||
+						                 (category.autoAssignable &&
+						                  TechLevelEqualCategory(weapon.techLevel, category.ammoType)));
+
+						dic.Add(weapon.defName, assigned && !category.excludeWeaponDefs.Contains(weapon.defName));
+						changes = true;
+					}
+				}
+
+				foreach (ThingDef weapon in AvailableProjectileWeapons)
+				{
+					bool hasAmmo = false;
+					foreach (AmmoCategoryDef category in AmmoCategoryDefs)
+					{
+						Settings.Settings.CategoryWeaponDictionary.TryGetValue(category.defName,
+							out Dictionary<string, bool> dic);
+
+						if (dic == null)
 						{
-							Settings.Settings.ExemptionWeaponDictionary.Add(weapon.defName,
-								weapon.HasModExtension<ExemptAmmoUsageExtension>());
+							continue;
 						}
+
+						dic.TryGetValue(weapon.defName, out bool value);
+						if (value)
+						{
+							hasAmmo = true;
+						}
+					}
+
+					if (Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weapon.defName, out bool isExempt))
+					{
+						if (hasAmmo || isExempt)
+						{
+							continue;
+						}
+
+						Settings.Settings.ExemptionWeaponDictionary.SetOrAdd(weapon.defName, true);
+						Log.Message(weapon.label + " - have no usable ammo for Ammunition Framework thus been exempt.");
+						changes = true;
+					}
+					else
+					{
+						Settings.Settings.ExemptionWeaponDictionary.Add(weapon.defName,
+							weapon.HasModExtension<ExemptAmmoUsageExtension>() || !hasAmmo);
+						changes = true;
 					}
 				}
 
@@ -420,10 +483,15 @@ namespace Ammunition.Logic
 					}
 
 					Settings.Settings.BagSettingsDictionary.Add(def.defName, intList);
+					changes = true;
 				}
 
 				Settings.Settings.GetDefaultAmmo();
 				ResetHyperlinks();
+				if (changes)
+				{
+					Save();
+				}
 			}
 			catch (Exception ex)
 			{
@@ -504,6 +572,10 @@ namespace Ammunition.Logic
 					i--;
 				}
 			}
+			if (IsExempt(def.defName))
+			{
+				return;
+			}
 
 			foreach (ThingDef ammoDef in AvailableAmmo.Where(ammoDef =>
 				         WeaponDefCanUseAmmoDef(def.defName, ammoDef.defName)))
@@ -514,6 +586,8 @@ namespace Ammunition.Logic
 				}
 
 				def.descriptionHyperlinks.Add(ammoDef);
+				ThingDef projectile = ammoDef.GetModExtension<AmmunitionExtension>()?.bulletDef;
+				def.descriptionHyperlinks.Add(projectile ?? def.Verbs.FirstOrDefault()?.defaultProjectile);
 			}
 		}
 
@@ -584,18 +658,13 @@ namespace Ammunition.Logic
 		/// <param name="weapon">The weapon used.</param>
 		/// <param name="kitComp">The kit being used.</param>
 		/// <param name="consumeAmmo">Whether to consume ammo when checking or not.</param>
-		/// <returns>true if ammo is available or not needed.</returns>
+		/// <returns>returns true if ammo is not needed or is otherwise available.</returns>
 		public static bool AmmoCheck(Pawn pawn, Thing weapon, out KitComponent kitComp, bool consumeAmmo)
 		{
 			kitComp = null;
 			try
 			{
-				if (pawn.DestroyedOrNull() || weapon.DestroyedOrNull() || pawn.apparel == null)
-				{
-					return true;
-				}
-
-				if (weapon.def.IsMeleeWeapon || !AmmoCategoryDefs.Any())
+				if (pawn.DestroyedOrNull() || weapon.DestroyedOrNull())
 				{
 					return true;
 				}
@@ -606,13 +675,18 @@ namespace Ammunition.Logic
 					return true;
 				}
 
+				if (pawn.apparel == null || weapon.def.IsMeleeWeapon || !AmmoCategoryDefs.Any())
+				{
+					return true;
+				}
+
 				if (IsExempt(weapon.def.defName))
 				{
 					return true;
 				}
 
 				//If all prior "fails", this means the weapon indeed need ammo.
-				if (pawn.apparel.WornApparelCount <= 0)
+				if (!pawn.apparel.AnyApparel)
 				{
 					return false;
 				}
@@ -626,23 +700,36 @@ namespace Ammunition.Logic
 				foreach (Kit kit in kits)
 				{
 					kitComp = kit.KitComp;
-					foreach (Bag t in kitComp.Bags.Where(t => t.Use &&
-					                                          t.ChosenAmmo != null &&
-					                                          t.Count > 0)
-						         .Where(t => WeaponDefCanUseAmmoDef(weapon.def.defName, t.ChosenAmmo.defName)))
+					Bag bag = kitComp.Bags.FirstOrDefault(
+						t => t.Use &&
+						     t.ChosenAmmo != null &&
+						     t.Count > 0 &&
+						     WeaponDefCanUseAmmoDef(
+							     weapon.def.defName, t.ChosenAmmo.defName));
+
+					if (bag == null)
 					{
-						if (consumeAmmo)
+						continue;
+					}
+
+					if (consumeAmmo)
+					{
+						if (pawn.IsColonist)
 						{
-							t.Count--;
+							bag.Count--;
+						}
+						else if (Settings.Settings.NpcUseAmmo)
+						{
+							bag.Count--;
 						}
 
-						kitComp.LastUsedAmmo = t.ChosenAmmo;
-						return true;
 					}
+
+					kitComp.LastUsedAmmo = bag.ChosenAmmo;
+					return true;
 				}
 
 				kitComp = null;
-
 				return false;
 			}
 			catch (Exception ex)
@@ -661,13 +748,9 @@ namespace Ammunition.Logic
 
 		public static bool IsExempt(string weaponDefName)
 		{
-			if (Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weaponDefName, out bool exempt))
-			{
-				return exempt;
-			}
-
-			return true;
+			return !Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weaponDefName, out bool exempt) || exempt;
 		}
+		
 
 		public static List<AmmoCategoryDef> AvailableAmmoForWeapon(string weaponDefName)
 		{
@@ -726,7 +809,5 @@ namespace Ammunition.Logic
 				.Select(app => app as Kit)
 				.ToList();
 		}
-
-
 	}
 }

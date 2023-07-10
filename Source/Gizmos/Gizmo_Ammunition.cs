@@ -8,6 +8,7 @@ using Verse;
 using System.Linq;
 using RimWorld;
 using System.Data.Common;
+using Ammunition.Models;
 using static HarmonyLib.Code;
 
 namespace Ammunition.Gizmos {
@@ -95,7 +96,11 @@ namespace Ammunition.Gizmos {
                             Text.Font = GameFont.Tiny;
                             Text.Anchor = TextAnchor.MiddleCenter;
                             if (Widgets.ButtonImage(recRightTop, DropIcon) && kitComp.Bags[i].Count > 0) {
-                                DebugThingPlaceHelper.DebugSpawn(kitComp.Bags[i].ChosenAmmo, kitComp.parent.PositionHeld, kitComp.Bags[i].Count);
+	                            Thing ammo = ThingMaker.MakeThing(kitComp.Bags[i].ChosenAmmo);
+                                ammo.stackCount = kitComp.Bags[i].Count;
+                                GenPlace.TryPlaceThing(ammo, kitComp.parent.PositionHeld, Find.CurrentMap,
+	                                ThingPlaceMode.Near);
+
                                 kitComp.Bags[i].Count = 0;
                                 kitComp.Bags[i].MaxCount = 0;
                             }
@@ -117,27 +122,22 @@ namespace Ammunition.Gizmos {
             return new GizmoResult(GizmoState.Clear);
 
         }
-        public IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateAmmoMenu(Models.Bag bag) {
+        public IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateAmmoMenu(Bag bag) {
             List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableAmmo.ToList().GetEnumerator();
             while (enumerator.MoveNext()) {
                 ThingDef ammoDef = enumerator.Current;
                 if (ammoDef != bag.ChosenAmmo)
-                    yield return new Widgets.DropdownMenuElement<ThingDef>() {
-                        option = new FloatMenuOption(ammoDef.label, delegate () {
-                            if (bag.Count > 0) {
-                                {
-                                    DebugThingPlaceHelper.DebugSpawn(bag.ChosenAmmo, kitComp.parent.PositionHeld, bag.Count);
-                                }
-                            }
-                            bag.Count = 0;
+                    yield return new Widgets.DropdownMenuElement<ThingDef>
+                    {
+                        option = new FloatMenuOption(ammoDef.label, delegate
+                        {
+	                        AmmoLogic.EmptyBagAt(bag, kitComp.parent.PositionHeld);
                             bag.MaxCount = bag.Capacity;
                             bag.ChosenAmmo = ammoDef;
-                        }, ammoDef.uiIcon, ammoDef.uiIconColor
-                        , MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
+                        }, ammoDef.uiIcon, ammoDef.uiIconColor),
                         payload = ammoDef,
                     };
             }
-            yield break;
         }
 
 

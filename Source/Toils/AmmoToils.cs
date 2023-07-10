@@ -1,4 +1,5 @@
 ﻿using System;
+using Ammunition.Logic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -71,13 +72,14 @@ namespace Ammunition.Toils {
             }
         }
 
-        public static Toil UnloadKit(TargetIndex ind, Ammunition.Components.KitComponent kit) {
+        public static Toil UnloadKit(TargetIndex ind, Components.KitComponent kit) {
             try {
                 Toil toil = new Toil();
                 toil.initAction = delegate {
                     Pawn actor = toil.actor;
                     Thing thing = actor.CurJob.GetTarget(ind).Thing;
-                    kit.Unload(thing.PositionHeld);
+                    
+                    AmmoLogic.EmptyKitAt(kit, thing.PositionHeld);
                     thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));
                 };
                 return toil;

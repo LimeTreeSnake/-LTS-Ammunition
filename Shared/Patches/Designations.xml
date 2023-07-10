@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+    <Operation Class="PatchOperationInsert">
+        <xpath>/Defs/DesignationCategoryDef[defName = "Orders"]/specialDesignatorClasses/li[11]</xpath>
+        <value>
+            <li>Ammunition.Designators.Designator_LootAmmo</li>
+        </value>
+    </Operation>
+</Patch>

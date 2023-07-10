@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 using Ammunition.Gizmos;
+using Ammunition.Logic;
+using Ammunition.Models;
 
 namespace Ammunition.Things {
     [StaticConstructorOnStartup]
@@ -11,43 +13,35 @@ namespace Ammunition.Things {
         private KitComponent kitComp;
         public void Initiate() {
             if (kitComp == null) {
-                kitComp = (KitComponent)AllComps.FirstOrDefault(x => x is KitComponent);
+                kitComp = (KitComponent)this.AllComps.FirstOrDefault(x => x is KitComponent);
             }
         }
 
         public override IEnumerable<Gizmo> GetWornGizmos() {
-            foreach (var item in base.GetWornGizmos()) {
+            foreach (Gizmo item in base.GetWornGizmos()) {
                 yield return item;
             };
             if (Find.Selector.SelectedPawns.Count > 1 && Settings.Settings.HideMultipleGizmos) {
                 yield break;
             }
-            if (Logic.AmmoLogic.AvailableAmmo.EnumerableNullOrEmpty()) {
+            if (AmmoLogic.AvailableAmmo.EnumerableNullOrEmpty()) {
                 yield break;
             }
             Initiate();
             if (this.Wearer.IsColonistPlayerControlled) {
                 yield return new Gizmo_Ammunition(kitComp);
             }
-            yield break;
         }
 
-        public bool AnythingToStrip() {
-            foreach (var item in KitComp.Bags) {
-                if (item.Count > 0)
-                    return true;
-            }
-            return false;
+        
+        public bool AnythingToStrip()
+        {
+	        return Enumerable.Any(KitComp.Bags, item => item.Count > 0);
         }
 
-        public void Strip() {
-            IntVec3 pos = this.SpawnedParentOrMe.PositionHeld;
-            foreach (var item in KitComp.Bags) {
-                if (item.Count > 0) {
-                    DebugThingPlaceHelper.DebugSpawn(item.ChosenAmmo, pos, item.Count);
-                    item.Count = 0;
-                }
-            }
+        public void Strip()
+        {
+	        AmmoLogic.EmptyKitAt(KitComp, this.SpawnedParentOrMe.PositionHeld);
         }
 
         public KitComponent KitComp {
