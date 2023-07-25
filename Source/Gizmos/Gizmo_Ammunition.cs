@@ -6,141 +6,231 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 using System.Linq;
-using RimWorld;
-using System.Data.Common;
 using Ammunition.Models;
-using static HarmonyLib.Code;
 
-namespace Ammunition.Gizmos {
-    [StaticConstructorOnStartup]
-    public class Gizmo_Ammunition : Gizmo {
+namespace Ammunition.Gizmos
+{
+	[StaticConstructorOnStartup]
+	public sealed class GizmoAmmunition : Gizmo
+	{
+		private readonly KitComponent _kitComp;
+		private Map CurrentMap => _kitComp?.parent.MapHeld;
+		private const float Margin = 2f;
+		private const float UtilityWidth = 34f;
+		private const float ControlsWidth = 150;
+		private static bool _draggingBar;
 
-        private static readonly Texture2D DropIcon = ContentFinder<Texture2D>.Get("UI/Buttons/Dismiss", true);
-        public KitComponent kitComp;
-        readonly float margin = 2f;
+		private static readonly List<float> _ammoBandPercentages = new List<float>()
+		{
+			0.0f,
+			0.1f,
+			0.2f,
+			0.3f,
+			0.4f,
+			0.5f,
+			0.6f,
+			0.7f,
+			0.8f,
+			0.9f,
+			1.0f
+		};
 
-        private static readonly Texture2D FullAmmoBarTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.5f, 0.5f, 0.6f));
-        private static readonly Texture2D BackgroundTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.1f, 0.1f, 0.1f, 0.75f));
-        public override float GetWidth(float maxWidth) {
-            return (float)(GetColumnWidth() * (IsSingle() ? (int)Math.Ceiling((double)(kitComp.Bags.Count)) : (int)Math.Ceiling((double)(kitComp.Bags.Count) / 2)));
-        }
-        public float GetColumnWidth() {
-            return (float)(Settings.Settings.UseWiderGizmo ? 100f : 75f);
-        }
-        public float GetPocketWidth() {
-            return (float)(Settings.Settings.UseWiderGizmo ? 77f : 52f);
-        }
-        public float GetUnloadWidth() {
-            return (float)(Settings.Settings.UseWiderGizmo ? 22f : 22f);
-        }
-        public bool IsSingle() {
-            return Settings.Settings.UseSingleLineAmmo || kitComp.Bags.Count == 1;
-        }
-        public Gizmo_Ammunition(KitComponent comp) {
-            kitComp = comp;
-            this.Order = -50f;
-        }
+		private static readonly Texture2D _targetAmmoBarTex =
+			SolidColorMaterials.NewSolidColorTexture(new Color(0.8f, 0.8f, 0.8f));
 
-        public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms) {
-            try {
-                if (kitComp != null && AmmoLogic.HaveAmmo) {
-                    Rect borderRect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
-                    Material material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
-                    GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex, material, default);
-                    if (kitComp.Bags.Any()) {
-                        for (int i = 0; i < kitComp.Bags.Count; i++) {
-                            if (kitComp.Bags[i].ChosenAmmo == null)
-                                kitComp.Bags[i].ChosenAmmo = Settings.Settings.InitialAmmoType != null ? Settings.Settings.InitialAmmoType : AmmoLogic.AvailableAmmo.First();
-                            Rect innerRect;
-                            int heightAdjust = 0;
-                            int columns = 0;
-                            if (IsSingle()) {
-                                columns = (int)Math.Ceiling((double)(i + 1));
-                                innerRect = borderRect.ContractedBy(margin);
-                                heightAdjust = 16;
-                            }
-                            else {
-                                columns = (int)Math.Ceiling((double)(i + 1) / 2);
-                                innerRect = i % 2 == 0 ? borderRect.ContractedBy(margin).TopHalf() : borderRect.ContractedBy(margin).BottomHalf();
-                            }
-                            int x = (int)(GetColumnWidth() * columns);
-                            innerRect.width = GetColumnWidth() - (margin * 2);
-                            innerRect.x = borderRect.x + (x - GetColumnWidth());
-                            if (i < 2)
-                                innerRect.x += margin;
-                            Widgets.DrawWindowBackground(innerRect);
-                            Rect recLeft = innerRect.LeftPartPixels(GetPocketWidth()).ContractedBy(margin);
-                            Rect recLeftTop = recLeft.TopHalf();
-                            Rect recLeftBot = recLeft.BottomHalf();
-                            Rect recRight = innerRect.RightPartPixels(GetUnloadWidth()).ContractedBy(margin);
-                            Rect recRightTop = recRight.TopHalf();
-                            recRightTop.height -= heightAdjust;
-                            Rect recRightBot = recRight.BottomHalf();
-                            recRightBot.height -= heightAdjust;
-                            if (Mouse.IsOver(recLeftTop)) {
-                                Widgets.DrawHighlight(recLeftTop);
-                            }
-                            float fillPercent = kitComp.Bags[i].Count / Mathf.Max(1f, kitComp.Bags[i].MaxCount);
-                            if (fillPercent > 1f)
-                                fillPercent = 1f;
-                            Widgets.FillableBar(recLeft, fillPercent, FullAmmoBarTex, TexUI.HighlightTex, false);
-                            Widgets.DrawTextureFitted(recLeft, Widgets.GetIconFor(kitComp.Bags[i].ChosenAmmo), 0.95f);
-                            GUI.DrawTexture(recLeftTop, BackgroundTex);
-                            Widgets.Dropdown(recLeftTop, kitComp.Bags[i], (Models.Bag bag) => kitComp.Bags[i].ChosenAmmo, GenerateAmmoMenu, kitComp.Bags[i].ChosenAmmo?.LabelCap, BaseContent.ClearTex);
-                            Text.Font = GameFont.Small;
-                            Text.Anchor = TextAnchor.UpperLeft;
-                            Widgets.Label(recLeft, (i + 1).ToString());
-                            Text.Font = GameFont.Tiny;
-                            Text.Anchor = TextAnchor.LowerCenter;
-                            kitComp.Bags[i].MaxCount = (int)Widgets.HorizontalSlider_NewTemp(recLeftBot, kitComp.Bags[i].MaxCount, 0f, kitComp.Bags[i].Capacity, true, kitComp.Bags[i].Count + " / " + kitComp.Bags[i].MaxCount);
-                            Text.Font = GameFont.Tiny;
-                            Text.Anchor = TextAnchor.MiddleCenter;
-                            if (Widgets.ButtonImage(recRightTop, DropIcon) && kitComp.Bags[i].Count > 0) {
-	                            Thing ammo = ThingMaker.MakeThing(kitComp.Bags[i].ChosenAmmo);
-                                ammo.stackCount = kitComp.Bags[i].Count;
-                                GenPlace.TryPlaceThing(ammo, kitComp.parent.PositionHeld, Find.CurrentMap,
-	                                ThingPlaceMode.Near);
+		private static readonly Texture2D _ammoBarTex =
+			SolidColorMaterials.NewSolidColorTexture(new Color(0.34f, 0.42f, 0.43f));
 
-                                kitComp.Bags[i].Count = 0;
-                                kitComp.Bags[i].MaxCount = 0;
-                            }
-                            TooltipHandler.TipRegion(recRightTop, Language.Translate.DropAll);
-                            Texture2D image = kitComp.Bags[i].Use ? Widgets.CheckboxOnTex : Widgets.CheckboxOffTex;
-                            if (Widgets.ButtonImage(recRightBot, image)) {
-                                kitComp.Bags[i].Use = !kitComp.Bags[i].Use;
-                            }
-                            TooltipHandler.TipRegion(recRightBot, Language.Translate.CanUse);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) {
-                Log.Error("LTS_Ammo framework GizmoOnGUI: " + ex.Message);
-            }
-            Text.Anchor = TextAnchor.UpperLeft;
-            Text.Font = GameFont.Small;
-            return new GizmoResult(GizmoState.Clear);
+		private static readonly Texture2D _ammoBarTexHighlightTex =
+			SolidColorMaterials.NewSolidColorTexture(new Color(0.43f, 0.54f, 0.55f));
 
-        }
-        public IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateAmmoMenu(Bag bag) {
-            List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableAmmo.ToList().GetEnumerator();
-            while (enumerator.MoveNext()) {
-                ThingDef ammoDef = enumerator.Current;
-                if (ammoDef != bag.ChosenAmmo)
-                    yield return new Widgets.DropdownMenuElement<ThingDef>
-                    {
-                        option = new FloatMenuOption(ammoDef.label, delegate
-                        {
-	                        AmmoLogic.EmptyBagAt(bag, kitComp.parent.PositionHeld);
-                            bag.MaxCount = bag.Capacity;
-                            bag.ChosenAmmo = ammoDef;
-                        }, ammoDef.uiIcon, ammoDef.uiIconColor),
-                        payload = ammoDef,
-                    };
-            }
-        }
+		private static readonly Texture2D _emptyBarTex =
+			SolidColorMaterials.NewSolidColorTexture(new Color(0.03f, 0.035f, 0.05f));
+
+		public override float GetWidth(float maxWidth)
+		{
+			return (GetColumnWidth() * (int)Math.Ceiling((double)(_kitComp.Bags.Count)));
+		}
+
+		private static float GetColumnWidth()
+		{
+			return (float)(!Settings.Settings.UseCompactGizmo ? 225f : 150f);
+		}
+
+		public GizmoAmmunition(KitComponent comp)
+		{
+			_kitComp = comp;
+			this.Order = -50f;
+		}
+
+		public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms)
+		{
+			try
+			{
+				if (_kitComp != null && AmmoLogic.HaveAmmo && _kitComp.Bags.Any())
+				{
+					var borderRect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
+					Material material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
+					//GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex,	material);
+					Widgets.DrawMenuSection(borderRect);
+
+					for (int i = 0; i < _kitComp.Bags.Count; i++)
+					{
+						AmmoSlot slot = _kitComp.Bags[i];
+						if (slot.ChosenAmmo == null)
+						{
+							slot.ChosenAmmo = AmmoLogic.AvailableAmmo.First();
+						}
+
+						int columns = (int)Math.Ceiling((double)(i + 1));
+						Rect innerRect = borderRect.ContractedBy(Margin);
+
+						int x = (int)(GetColumnWidth() * columns);
+						innerRect.width = GetColumnWidth() - (Margin * 2);
+						innerRect.x = borderRect.x + (x - GetColumnWidth());
+						if (i < 2)
+						{
+							innerRect.x += Margin;
+						}
 
 
+						innerRect.SplitVerticallyWithMargin(out Rect recImage, out Rect recAmmoGizmo, out _,
+							Margin, null, ControlsWidth);
 
-    }
+						if (!Settings.Settings.UseCompactGizmo)
+						{
+							GenUI.DrawTextureWithMaterial(recImage, parms.shrunk ? Command.BGTexShrunk : Command.BGTex,
+								material);
+							Widgets.DrawTextureFitted(recImage, slot.ChosenAmmo.uiIcon, 0.95f);
+						}
+
+						recAmmoGizmo.SplitVerticallyWithMargin(out Rect recLeft, out Rect recRight, out _,
+							Margin, null, UtilityWidth);
+
+						recLeft.SplitHorizontallyWithMargin(out Rect recLeftTop, out Rect recLeftBot, out _,
+							Margin, recAmmoGizmo.height / 2);
+
+						Widgets.DrawBoxSolid(recLeftTop, Widgets.WindowBGFillColor);
+						Widgets.DrawBoxSolid(recLeftBot, Widgets.WindowBGFillColor);
+						recRight.SplitHorizontallyWithMargin(out Rect recRightTop, out Rect recRightBot, out _,
+							Margin, recAmmoGizmo.height / 2);
+
+						Widgets.DrawBoxSolid(recRightTop, Widgets.WindowBGFillColor);
+						Widgets.DrawBoxSolid(recRightBot, Widgets.WindowBGFillColor);
+
+						if (Mouse.IsOver(recLeftTop))
+						{
+							Widgets.DrawHighlight(recLeftTop);
+						}
+
+						float fillPercent = slot.Count / Mathf.Max(1f, slot.MaxCount);
+						if (fillPercent > 1f)
+						{
+							fillPercent = 1f;
+						}
+
+						float max = (float)slot.MaxCount / slot.Capacity;
+						Widgets.DraggableBar(recLeftBot,
+							_ammoBarTex,
+							_ammoBarTexHighlightTex,
+							_emptyBarTex,
+							_targetAmmoBarTex,
+							ref _draggingBar,
+							fillPercent,
+							ref max,
+							_ammoBandPercentages, 16);
+
+						if (Math.Abs(slot.MaxCount - max) > 0.01f)
+						{
+							slot.MaxCount = (int)(max * slot.Capacity);
+						}
+						
+						Widgets.Dropdown(recLeftTop, slot,
+							(ammoSlot) => slot.ChosenAmmo, GenerateAmmoMenu,
+							slot.ChosenAmmo?.LabelCap, BaseContent.ClearTex);
+
+						Text.Anchor = TextAnchor.MiddleCenter;
+						Widgets.Label(recLeftTop, slot.ChosenAmmo?.label);
+						Widgets.Label(recLeftBot, slot.Count + " / " + slot.MaxCount);
+						if (Widgets.ButtonImage(recRightTop, Settings.Settings.DropIcon) && slot.Count > 0)
+						{
+							Thing ammo = ThingMaker.MakeThing(slot.ChosenAmmo);
+							ammo.stackCount = slot.Count;
+							GenPlace.TryPlaceThing(ammo, _kitComp.parent.PositionHeld, Find.CurrentMap,
+								ThingPlaceMode.Near);
+
+							slot.Count = 0;
+							slot.MaxCount = 0;
+						}
+
+						TooltipHandler.TipRegion(recRightTop, Language.Translate.DropAll);
+						Texture2D image = slot.Use ? Settings.Settings.TrueIcon : Settings.Settings.FalseIcon;
+						if (Widgets.ButtonImage(recRightBot, image))
+						{
+							slot.Use = !slot.Use;
+						}
+
+						TooltipHandler.TipRegion(recRightBot, Language.Translate.CanUse);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error("LTS_Ammo framework GizmoOnGUI: " + ex.Message);
+			}
+
+			Text.Anchor = TextAnchor.UpperLeft;
+			return new GizmoResult(GizmoState.Clear);
+		}
+
+		private IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateAmmoMenu(AmmoSlot ammoSlot)
+		{
+			using (List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableAmmo.ToList().GetEnumerator())
+			{
+				bool yielded = false;
+				while (enumerator.MoveNext())
+				{
+					ThingDef ammoDef = enumerator.Current;
+
+					if (ammoDef == null)
+					{
+						continue;
+					}
+
+					if (ammoDef == ammoSlot.ChosenAmmo)
+					{
+						continue;
+					}
+
+					if (_kitComp == null || _kitComp.parent.MapHeld.listerThings.ThingsOfDef(ammoDef).NullOrEmpty())
+					{
+						continue;
+					}
+
+
+					yielded = true;
+					yield return new Widgets.DropdownMenuElement<ThingDef>
+					{
+						option = new FloatMenuOption(ammoDef.label, delegate
+						{
+							AmmoLogic.EmptyBagAt(ammoSlot, _kitComp.parent.PositionHeld);
+							ammoSlot.MaxCount = ammoSlot.Capacity;
+							ammoSlot.ChosenAmmo = ammoDef;
+						}, ammoDef.uiIcon, ammoDef.uiIconColor),
+						payload = ammoDef,
+					};
+				}
+
+				if (!yielded)
+				{
+					yield return new Widgets.DropdownMenuElement<ThingDef>
+					{
+						option = new FloatMenuOption(Language.Translate.NoAmmo, null)
+					};
+				}
+			}
+		}
+
+
+	}
 }
