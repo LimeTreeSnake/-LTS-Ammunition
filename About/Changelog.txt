@@ -1,4 +1,13 @@
 ﻿[LTS]Ammunition - Framework
+2023-07-25
+    - Added Burst count to AmmunitionExtension, making it possible to make Shotgun ammo.
+    - Made Ammo Logic public
+    - Added a label for used ammo.
+    - Added weighted options for ammo categories for random npc spawning.
+    - Updated mod settings for better readability
+    - Updated Gizmo UI for better readability
+    - Default random pawn ammo spawn rate -> 30%-60%
+
 2023-07-02
     - Fixed projectiles not changing bullets depending on ammo properly.
     - Added ultratech ammo type.

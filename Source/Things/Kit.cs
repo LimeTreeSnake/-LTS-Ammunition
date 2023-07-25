@@ -29,7 +29,7 @@ namespace Ammunition.Things {
             }
             Initiate();
             if (this.Wearer.IsColonistPlayerControlled) {
-                yield return new Gizmo_Ammunition(kitComp);
+                yield return new GizmoAmmunition(kitComp);
             }
         }
 

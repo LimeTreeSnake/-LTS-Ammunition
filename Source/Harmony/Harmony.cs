@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ammunition.Components;
+using Ammunition.DefModExtensions;
 using Ammunition.Designators;
 using Ammunition.Language;
 using Ammunition.Logic;
@@ -33,7 +34,8 @@ namespace Ammunition.Harmony
 				new HarmonyMethod(typeof(Harmony).GetMethod("TryCastShot_PreFix")));
 
 			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"),
-				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PreFix")));
+				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PreFix")),
+				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PostFix")));
 
 			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile"),
 				new HarmonyMethod(typeof(Harmony).GetMethod("Projectile_PreFix")));
@@ -55,7 +57,7 @@ namespace Ammunition.Harmony
 			AmmoLogic.Initialize();
 		}
 
-		public static void HasHuntingWeapon_PostFix(Pawn p, bool __result)
+		public static void HasHuntingWeapon_PostFix(Pawn p, ref bool __result)
 		{
 			try
 			{
@@ -114,12 +116,13 @@ namespace Ammunition.Harmony
 		}
 
 		[HarmonyPriority(150)]
-		public static bool WarmupComplete_PreFix(Verb_LaunchProjectile __instance)
+		public static bool WarmupComplete_PreFix(Verb_LaunchProjectile __instance, out KitComponent __state)
 		{
+			__state = null;
 			try
 			{
 				return !Settings.Settings.UseAmmoPerBullet ||
-				       AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
+				       AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out __state, true);
 			}
 			catch (Exception e)
 			{
@@ -129,7 +132,7 @@ namespace Ammunition.Harmony
 		}
 
 		[HarmonyPriority(150)]
-		public static bool TryCastShot_PreFix(bool __result, Verb_LaunchProjectile __instance)
+		public static bool TryCastShot_PreFix(ref bool __result, Verb_LaunchProjectile __instance)
 		{
 			try
 			{
@@ -143,6 +146,26 @@ namespace Ammunition.Harmony
 			{
 				Log.Message(e.Message);
 				return true;
+			}
+		}
+
+		[HarmonyPriority(150)]
+		public static void WarmupComplete_PostFix(Verb_LaunchProjectile __instance, KitComponent __state)
+		{
+			if (__state == null)
+			{
+				return;
+			}
+
+			int burst = __state.LastUsedAmmo.GetModExtension<AmmunitionExtension>().burstCount;
+			if (burst <= 1)
+			{
+				return;
+			}
+
+			for (int i = 1; i < burst; i++)
+			{
+				Traverse.Create(__instance).Method("TryCastShot").GetValue();
 			}
 		}
 
@@ -171,8 +194,7 @@ namespace Ammunition.Harmony
 				return true;
 			}
 		}
-
-
+		
 		public static void GeneratePawn_PostFix(Pawn __result)
 		{
 			if (__result?.apparel != null)

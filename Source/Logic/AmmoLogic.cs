@@ -10,13 +10,11 @@ using Ammunition.Components;
 using Ammunition.DefModExtensions;
 using Ammunition.Models;
 using Ammunition.Things;
-using System.Text;
 
 namespace Ammunition.Logic
 {
-
 	[StaticConstructorOnStartup]
-	static class AmmoLogic
+	public static class AmmoLogic
 	{
 
 		/// <summary>
@@ -203,41 +201,68 @@ namespace Ammunition.Logic
 
 		public static void EmptyKitAt(KitComponent kit, IntVec3 pos)
 		{
-			foreach (Bag t in kit.Bags)
+			foreach (AmmoSlot t in kit.Bags)
 			{
 				EmptyBagAt(t, pos);
 			}
 		}
 
-		public static void EmptyBagAt(Bag bag, IntVec3 pos)
+		public static void EmptyBagAt(AmmoSlot ammoSlot, IntVec3 pos)
 		{
-			if (bag.Count < 1)
+			if (ammoSlot.Count < 1)
 			{
 				return;
 			}
 
-			Thing ammo = ThingMaker.MakeThing(bag.ChosenAmmo);
-			ammo.stackCount = bag.Count;
+			Thing ammo = ThingMaker.MakeThing(ammoSlot.ChosenAmmo);
+			ammo.stackCount = ammoSlot.Count;
 			GenPlace.TryPlaceThing(ammo, pos, Find.CurrentMap,
 				ThingPlaceMode.Near);
 
-			bag.Count = 0;
+			ammoSlot.Count = 0;
 		}
+
+		// ReSharper disable once MemberCanBePrivate.Global
+		public static int GetRandomWeightedIndex(List<int> weights)
+		{
+			if (weights.NullOrEmpty())
+			{
+				return 0;
+			}
+
+			float r = Rand.Range(0, weights.Sum());
+
+			foreach (int t in weights)
+			{
+				if (!(t <= r))
+				{
+					return t;
+				}
+
+				r -= t;
+			}
+
+			return 0;
+		}
+
 
 		private static void LoadSpawnedKit(Kit apparel, AmmoCategoryDef def, Pawn pawn = null)
 		{
 			for (int i = 0; i < apparel.KitComp.Bags.Count; i++)
 			{
-				string ammoDef = def.ammoDefs.RandomElement();
+				string ammoDef = def.weightList.Any()
+					? def.ammoDefs[GetRandomWeightedIndex(def.weightList)]
+					: def.ammoDefs.RandomElement();
+
 				apparel.KitComp.Bags[i].ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
 				if (apparel.KitComp.Bags[i].ChosenAmmo != null)
 				{
 					apparel.KitComp.Bags[i].MaxCount = apparel.KitComp.Props.ammoCapacity[i];
 					apparel.KitComp.Bags[i].Count =
 						(int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] *
-						                 Settings.Settings.PawnAmmoMinSpawnRate,
+						                 (Settings.Settings.Range.min / 100f),
 							      apparel.KitComp.Props.ammoCapacity[i]) *
-						      Settings.Settings.PawnAmmoSpawnRate);
+						      (Settings.Settings.Range.max / 100f));
 
 					if (pawn != null)
 					{
@@ -256,26 +281,26 @@ namespace Ammunition.Logic
 		{
 			try
 			{
-				if (p.apparel == null)
-				{
-					return;
-				}
-
 				if ((p.RaceProps.IsMechanoid /*&& !Settings.Settings.UseMechanoidAmmo*/) ||
 				    (p.RaceProps.Animal /*&& !Settings.Settings.UseAnimalAmmo*/))
 				{
 					return;
 				}
-
+				
+				if (p.apparel == null || p.equipment == null)
+				{
+					return;
+				}
+				
+				if (p.equipment.Primary == null)
+				{
+					return;
+				}
+				
 				Kit apparel = null;
 				if (p.apparel.WornApparelCount > 0)
 				{
 					apparel = (Kit)p.apparel.WornApparel.FirstOrDefault(x => x.TryGetComp<KitComponent>() != null);
-				}
-
-				if (p.equipment?.Primary == null)
-				{
-					return;
 				}
 
 				IEnumerable<AmmoCategoryDef> categories = AmmoCategoryDefs.Where(x =>
@@ -303,6 +328,12 @@ namespace Ammunition.Logic
 					            p.apparel.CanWearWithoutDroppingAnything(y))
 					.OrderBy(x => x.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum())
 					.ToList();
+
+				if (sorted.NullOrEmpty())
+				{
+					Log.Message("LTS_Ammo - No kits available for pawn");
+					return;
+				}
 
 				ThingDef kit = null;
 				if (!p.ageTracker.Adult)
@@ -380,7 +411,7 @@ namespace Ammunition.Logic
 					Log.Error("There are no ammo mods installed, only the framework!");
 					return;
 				}
-				
+
 				foreach (AmmoCategoryDef category in AmmoCategoryDefs)
 				{
 					//Create a dictionary for fast tracking of what ammo is in what category.
@@ -401,6 +432,7 @@ namespace Ammunition.Logic
 					{
 						Settings.Settings.CategoryWeaponDictionary.Add(category.defName,
 							new Dictionary<string, bool>());
+
 						changes = true;
 					}
 
@@ -411,9 +443,10 @@ namespace Ammunition.Logic
 					{
 						Settings.Settings.CategoryWeaponDictionary.SetOrAdd(category.defName,
 							new Dictionary<string, bool>());
+
 						changes = true;
 					}
-					
+
 					foreach (ThingDef weapon in AvailableProjectileWeapons)
 					{
 						if (dic == null || dic.ContainsKey(weapon.defName))
@@ -465,6 +498,7 @@ namespace Ammunition.Logic
 					{
 						Settings.Settings.ExemptionWeaponDictionary.Add(weapon.defName,
 							weapon.HasModExtension<ExemptAmmoUsageExtension>() || !hasAmmo);
+
 						changes = true;
 					}
 				}
@@ -485,8 +519,7 @@ namespace Ammunition.Logic
 					Settings.Settings.BagSettingsDictionary.Add(def.defName, intList);
 					changes = true;
 				}
-
-				Settings.Settings.GetDefaultAmmo();
+				
 				ResetHyperlinks();
 				if (changes)
 				{
@@ -572,6 +605,7 @@ namespace Ammunition.Logic
 					i--;
 				}
 			}
+
 			if (IsExempt(def.defName))
 			{
 				return;
@@ -700,14 +734,14 @@ namespace Ammunition.Logic
 				foreach (Kit kit in kits)
 				{
 					kitComp = kit.KitComp;
-					Bag bag = kitComp.Bags.FirstOrDefault(
+					AmmoSlot ammoSlot = kitComp.Bags.FirstOrDefault(
 						t => t.Use &&
 						     t.ChosenAmmo != null &&
 						     t.Count > 0 &&
 						     WeaponDefCanUseAmmoDef(
 							     weapon.def.defName, t.ChosenAmmo.defName));
 
-					if (bag == null)
+					if (ammoSlot == null)
 					{
 						continue;
 					}
@@ -716,16 +750,16 @@ namespace Ammunition.Logic
 					{
 						if (pawn.IsColonist)
 						{
-							bag.Count--;
+							ammoSlot.Count--;
 						}
 						else if (Settings.Settings.NpcUseAmmo)
 						{
-							bag.Count--;
+							ammoSlot.Count--;
 						}
 
 					}
 
-					kitComp.LastUsedAmmo = bag.ChosenAmmo;
+					kitComp.LastUsedAmmo = ammoSlot.ChosenAmmo;
 					return true;
 				}
 
@@ -750,7 +784,6 @@ namespace Ammunition.Logic
 		{
 			return !Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weaponDefName, out bool exempt) || exempt;
 		}
-		
 
 		public static List<AmmoCategoryDef> AvailableAmmoForWeapon(string weaponDefName)
 		{

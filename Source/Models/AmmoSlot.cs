@@ -3,7 +3,7 @@ using Verse;
 
 namespace Ammunition.Models {
     [Serializable]
-    public class Bag : IExposable {
+    public class AmmoSlot : IExposable {
         private ThingDef chosenAmmo;
         private int count;
         private int maxCount;

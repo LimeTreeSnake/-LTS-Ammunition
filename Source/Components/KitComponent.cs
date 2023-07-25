@@ -15,13 +15,13 @@ namespace Ammunition.Components
 
 		#region Fields
 
-		private List<Bag> _bags = new List<Bag>();
+		private List<AmmoSlot> _bags = new List<AmmoSlot>();
 
 		#endregion Fields
 
 		#region Properties
 
-		public List<Bag> Bags
+		public List<AmmoSlot> Bags
 		{
 			get
 			{
@@ -47,17 +47,14 @@ namespace Ammunition.Components
 		{
 			if (_bags == null)
 			{
-				_bags = new List<Bag>();
+				_bags = new List<AmmoSlot>();
 			}
 
 			if (Settings.Settings.BagSettingsDictionary.TryGetValue(this.parent.def.defName, out List<int> bagSettings))
 			{
-				foreach (Bag bag in bagSettings.Select(t => new Bag
+				foreach (AmmoSlot bag in bagSettings.Select(t => new AmmoSlot
 				         {
-					         ChosenAmmo =
-						         Settings.Settings.InitialAmmoType == null
-							         ? Settings.Settings.GetDefaultAmmo()
-							         : Settings.Settings.InitialAmmoType,
+					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
 					         Count = 0,
 					         Capacity = t,
 					         MaxCount = t,
@@ -74,12 +71,9 @@ namespace Ammunition.Components
 					return;
 				}
 
-				foreach (Bag bag in compPropsKit.ammoCapacity.Select(t => new Bag
+				foreach (AmmoSlot bag in compPropsKit.ammoCapacity.Select(t => new AmmoSlot
 				         {
-					         ChosenAmmo =
-						         Settings.Settings.InitialAmmoType == null
-							         ? Settings.Settings.GetDefaultAmmo()
-							         : Settings.Settings.InitialAmmoType,
+					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
 					         Count = 0,
 					         Capacity = t,
 					         MaxCount = t,
@@ -120,38 +114,28 @@ namespace Ammunition.Components
 				return;
 			}
 
-			if (Settings.Settings.InitialAmmoType != null &&
-			    AmmoLogic.WeaponDefCanUseAmmoDef(pawn.equipment.Primary.def.defName,
-				    Settings.Settings.InitialAmmoType.defName))
+			List<AmmoCategoryDef> ammoCategories =
+				AmmoLogic.AvailableAmmoForWeapon(pawn.equipment.Primary.def.defName);
+
+			if (ammoCategories == null || !ammoCategories.Any())
 			{
-				foreach (Bag t in _bags)
-				{
-					t.ChosenAmmo = Settings.Settings.InitialAmmoType;
-				}
+				return;
 			}
-			else
+
+			string ammoDefName = ammoCategories.RandomElement().ammoDefs.RandomElement();
+			ThingDef ammoDef = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
+			if (ammoDef == null)
 			{
-				List<AmmoCategoryDef> ammoCategories =
-					AmmoLogic.AvailableAmmoForWeapon(pawn.equipment.Primary.def.defName);
-
-				if (ammoCategories == null || !ammoCategories.Any())
-				{
-					return;
-				}
-
-				string ammoDefName = ammoCategories.RandomElement().ammoDefs.RandomElement();
-				ThingDef ammoDef = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
-				if (ammoDef == null)
-				{
-					return;
-				}
-
-				foreach (Bag t in _bags)
-				{
-					t.ChosenAmmo = ammoDef;
-				}
-
+				return;
 			}
+
+			foreach (AmmoSlot t in _bags.Where(t =>
+				         !AmmoLogic.WeaponDefCanUseAmmoDef(pawn.equipment.Primary.def.defName, t.ChosenAmmo.defName)))
+			{
+				t.ChosenAmmo = ammoDef;
+			}
+
+
 		}
 	}
 

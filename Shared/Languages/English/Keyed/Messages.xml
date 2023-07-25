@@ -2,40 +2,33 @@
 <LanguageData>
     <!--Mod Settings-->
     <LTSAmmunition>Ammunition</LTSAmmunition>
-    <LTSAmmunitionCategory>Category: </LTSAmmunitionCategory>
-    <LTSAnimalAmmo>Animals require ammo:; (Don't use, animals probably can't wear kits)</LTSAnimalAmmo>
-    <LTSAnimalAmmoDesc>Whether animals require ammo (true) or can fire indefinitely (false)</LTSAnimalAmmoDesc>
-    <LTSAvailableAmmoCategory>Ammunition in category.</LTSAvailableAmmoCategory>
-    <LTSAvailableKits>Available kits.</LTSAvailableKits>
-    <LTSAddBag>Add a bag to this kit.</LTSAddBag>
-    <LTSChangeBagDesc>Notice: Only newly spawned kits will use these settings.</LTSChangeBagDesc>
-    <LTSBagNumber>Bag number {0} ammo capacity - </LTSBagNumber>
-    <LTSDisableMod>Disable usage For Filtered</LTSDisableMod>
-    <LTSDefaultAssociation>Set Defaults For Filtered</LTSDefaultAssociation>
-    <LTSDisable>Disable All Filtered</LTSDisable>
-    <LTSEnable>Enable All Filtered</LTSEnable>
-    <LTSEnableMod>Enable usage For Filtered</LTSEnableMod>
-    <LTSExemptWeapon>If checked, this weapon requires ammo.</LTSExemptWeapon>
+    <LTSAmmunitionCategory>Category:</LTSAmmunitionCategory>
+    <LTSAvailableAmmoCategory>Configure Category:</LTSAvailableAmmoCategory>
+    <LTSAvailableAmmoCategoryDesc>Ammunition in currently selected category:</LTSAvailableAmmoCategoryDesc>
+    <LTSAddSlot>Add Slot +</LTSAddSlot>
+    <LTSChangeBag>Note: Settings will only be applied to newly created kits.</LTSChangeBag>
+    <LTSConfigureKit>Configure Kit:</LTSConfigureKit>
+    <LTSBagNumber>Ammo slot {0} | Capacity - </LTSBagNumber>
+    <LTSAmmoFilterOptions>Filter Options:</LTSAmmoFilterOptions>
+    <LTSAmmoWeaponsOptions>Weapons:</LTSAmmoWeaponsOptions>
+    <LTSAmmoCategoryOptions>Can use {0}?</LTSAmmoCategoryOptions>
+    <LTSAmmoUsageOptions>Requires Ammo?</LTSAmmoUsageOptions>
+    <LTSAmmoSearchOptions>Search:</LTSAmmoSearchOptions>
     <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
-    <LTSHideMultipleGizmosDesc>Whether kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
-    <LTSMechanoidAmmo>Mechanoids require ammo: (Don't use, mechs probably can't wear kits)</LTSMechanoidAmmo>
-    <LTSMechanoidAmmoDesc>Whether mechanoids require ammo (true) or can fire indefinitely (false)</LTSMechanoidAmmoDesc>
-    <LTSUseWiderGizmo>Wider ammo gizmo</LTSUseWiderGizmo>
-    <LTSUseWiderGizmoDesc>Whether to use the slightly wider gizmo (true) or the standard vanilla gizmo size (false)</LTSUseWiderGizmoDesc>
-    <LTSUseSingleLineAmmo>One per column gizmo</LTSUseSingleLineAmmo>
-    <LTSUseSingleLineAmmoDesc>Whether ammunition gizmo fills the entire gizmo(true) or is split in two rows to save space(false)</LTSUseSingleLineAmmoDesc>
+    <LTSHideMultipleGizmosDesc>Whether all kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
+    <LTSUseWiderGizmo>Use compact kit gizmos</LTSUseWiderGizmo>
+    <LTSUseWiderGizmoDesc>Whether to use the smaller gizmo without image (true) or the standard one (false)</LTSUseWiderGizmoDesc>
     <LTSNoAmmoCategories>There are no ammo mods installed.</LTSNoAmmoCategories>
-    <LTSNpcMaxAmmo>Pawn maximum ammo spawn: {0}%.</LTSNpcMaxAmmo>
-    <LTSNpcMaxAmmoDesc>The maximum amount of ammo a pawn can spawn with in their kit.</LTSNpcMaxAmmoDesc>
-    <LTSNpcMinAmmo>Pawn minimum ammo spawn: {0}%.</LTSNpcMinAmmo>
-    <LTSNpcMinAmmoDesc>The minimum amount of ammo a pawn can spawn with in their kit.</LTSNpcMinAmmoDesc>
-    <LTSNpcUseAmmo>Non-colonists use ammo?</LTSNpcUseAmmo>
-    <LTSNpcUseAmmoDesc>If checked true, enemies and guests will consume ammo upon using their ranged weapons. If false, they don't consume any ammunition. (Do note, they will still need at least 1 ammo which can thus last indefinitely.)</LTSNpcUseAmmoDesc>
-    <LTSPerBullet>Ammo per bullet</LTSPerBullet>
-    <LTSPerBulletDesc>Whether firing a weapon consumes ammo per bullet(true) or per burst(false).</LTSPerBulletDesc>
+    <LTSNpcMaxAmmo>Minimum and maximum ammo pawns can spawn with: {0}% - {1}%.</LTSNpcMaxAmmo>
+    <LTSNpcUseAmmo>Non-colonists use ammo</LTSNpcUseAmmo>
+    <LTSNpcUseAmmoDesc>If checked true, enemies and guests will consume ammo upon using their ranged weapons. If false, they don't consume any ammunition. (Do note, they will still need at least 1 useable ammo in their kit which can thus last indefinitely much like how companions work in skyrim.)</LTSNpcUseAmmoDesc>
+    <LTSPerBullet>Use 1 ammo per bullet</LTSPerBullet>
+    <LTSPerBulletDesc>Whether firing a weapon consumes 1 ammo per bullet fired in a burst(true) or 1 ammo total per burst(false).</LTSPerBulletDesc>
     <LTSSelectedStandardAmmo>Default</LTSSelectedStandardAmmo>
-    <LTSUseAmmo>If checked, this weapon can use {0}</LTSUseAmmo>
-    <LTSWeapons>Weapons</LTSWeapons>
+    <LTSSettingsGeneral>General Settings</LTSSettingsGeneral>
+    <LTSSettingsKitsConfiguration>Kits Configuration</LTSSettingsKitsConfiguration>
+    <LTSSettingsAmmoConfiguration>Ammo Configuration</LTSSettingsAmmoConfiguration>
+    <LtsSettingsResetAll>Are you sure?</LtsSettingsResetAll>
 
     <!--Messages-->
     <LTSDropAll>Drop all</LTSDropAll>

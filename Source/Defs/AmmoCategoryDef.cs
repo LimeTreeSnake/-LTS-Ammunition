@@ -9,6 +9,7 @@ namespace Ammunition.Defs {
         public List<string> ammoDefs;
         public List<string> includeWeaponDefs;
         public List<string> excludeWeaponDefs;
+        public List<int> weightList;
         public AmmoTypes ammoType;
         public bool autoAssignable = true;
     }
