@@ -87,6 +87,7 @@
     <Compile Include="Logic\SaveFile.cs" />
     <Compile Include="Models\AmmoSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\DialogConfirm.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Things\Ammo.cs" />
     <Compile Include="Things\Kit.cs" />

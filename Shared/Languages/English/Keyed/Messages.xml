@@ -14,6 +14,7 @@
     <LTSAmmoCategoryOptions>Can use {0}?</LTSAmmoCategoryOptions>
     <LTSAmmoUsageOptions>Requires Ammo?</LTSAmmoUsageOptions>
     <LTSAmmoSearchOptions>Search:</LTSAmmoSearchOptions>
+    <LtsAmmoDebugging>[Dev] Debugging messages</LtsAmmoDebugging>
     <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
     <LTSHideMultipleGizmosDesc>Whether all kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
     <LTSUseWiderGizmo>Use compact kit gizmos</LTSUseWiderGizmo>
@@ -28,7 +29,13 @@
     <LTSSettingsGeneral>General Settings</LTSSettingsGeneral>
     <LTSSettingsKitsConfiguration>Kits Configuration</LTSSettingsKitsConfiguration>
     <LTSSettingsAmmoConfiguration>Ammo Configuration</LTSSettingsAmmoConfiguration>
-    <LtsSettingsResetAll>Are you sure?</LtsSettingsResetAll>
+    <LTSSettingsResetAll>Are you sure?</LTSSettingsResetAll>
+    <LTSSettingsSaveAsDefault>Save as default</LTSSettingsSaveAsDefault>
+    <LTSSettingsSaveAsDefaultDesc>Saves to your mod config folder, the current ammuntion setup.</LTSSettingsSaveAsDefaultDesc>
+    <LTSSettingsLoadDefault>Load default</LTSSettingsLoadDefault>
+    <LTSSettingsLoadDefaultDesc>Loads from the config folder, the current ammuntion setup.</LTSSettingsLoadDefaultDesc>
+    <LTSOk>OK</LTSOk>
+    <LTSCancel>Cancel</LTSCancel>
 
     <!--Messages-->
     <LTSDropAll>Drop all</LTSDropAll>

@@ -34,7 +34,7 @@ namespace Ammunition.Components
 		public ThingDef LastUsedAmmo { get; set; }
 
 		public ThingDef LastUsedBullet => LastUsedAmmo?.GetModExtension<AmmunitionExtension>()?.bulletDef;
-
+		
 		#endregion Properties
 
 		public override void Initialize(CompProperties props)
@@ -54,10 +54,9 @@ namespace Ammunition.Components
 			{
 				foreach (AmmoSlot bag in bagSettings.Select(t => new AmmoSlot
 				         {
-					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
-					         Count = 0,
 					         Capacity = t,
-					         MaxCount = t,
+					         Count = 0,
+					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
 					         Use = true
 				         }))
 				{
@@ -73,10 +72,9 @@ namespace Ammunition.Components
 
 				foreach (AmmoSlot bag in compPropsKit.ammoCapacity.Select(t => new AmmoSlot
 				         {
-					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
-					         Count = 0,
 					         Capacity = t,
-					         MaxCount = t,
+					         Count = 0,
+					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
 					         Use = true
 				         }))
 				{
@@ -119,10 +117,11 @@ namespace Ammunition.Components
 
 			if (ammoCategories == null || !ammoCategories.Any())
 			{
+				Log.Message("There is no ammo for this weapon available but it needs ammo. Check your mod settings");
 				return;
 			}
 
-			string ammoDefName = ammoCategories.RandomElement().ammoDefs.RandomElement();
+			string ammoDefName = ammoCategories.RandomElement().ammoDefs.FirstOrDefault();
 			ThingDef ammoDef = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
 			if (ammoDef == null)
 			{

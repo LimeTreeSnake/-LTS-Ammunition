@@ -1,4 +1,18 @@
 ﻿[LTS]Ammunition - Framework
+2023-08-02
+    - Flipped east image of ammunition bench, was wrong whops.
+    - Added size feature to ammo, kits can carry less large ammo if category of ammo is large.
+    - Added confirm button for default settings.
+    - Added option to save your own default ammo/weapon settings.
+        This includes a Readable file which you can send to me for adding certain weapon defs to categories.
+
+2023-07-26
+    - Added debugging logging option.
+    - Fixed issue with pawns spawning without kits
+    - Changed harmony patching from TryCastShot -> TryCastNextBurstShot when calculating per bullet ammo consumption
+    - Changed Available and WarmupComplete to patch Verbs instead of Verb_LaunchProjectile.
+    - Some code cleanup
+
 2023-07-25
     - Added Burst count to AmmunitionExtension, making it possible to make Shotgun ammo.
     - Made Ammo Logic public

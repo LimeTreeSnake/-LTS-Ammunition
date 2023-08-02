@@ -222,19 +222,25 @@ namespace Ammunition.Logic
 			ammoSlot.Count = 0;
 		}
 
-		// ReSharper disable once MemberCanBePrivate.Global
-		public static int GetRandomWeightedIndex(List<int> weights)
+		private static int GetRandomWeightedIndex(List<int> weights)
 		{
 			if (weights.NullOrEmpty())
 			{
 				return 0;
 			}
 
-			float r = Rand.Range(0, weights.Sum());
+			int sum = weights.Sum();
+
+			if (sum < 1)
+			{
+				return 0;
+			}
+
+			float r = Rand.Range(0, sum);
 
 			foreach (int t in weights)
 			{
-				if (!(t <= r))
+				if (t <= r)
 				{
 					return t;
 				}
@@ -245,24 +251,27 @@ namespace Ammunition.Logic
 			return 0;
 		}
 
+		public static int GetAmmoWeight(ThingDef ammo)
+		{
+			IEnumerable<AmmoCategoryDef> categoriesWithAmmo = _ammoToCategoriesDictionary.TryGetValue(ammo.defName);
+			return categoriesWithAmmo.EnumerableNullOrEmpty() ? 1 : categoriesWithAmmo.Max(x => x.ammoWeight);
+		}
 
 		private static void LoadSpawnedKit(Kit apparel, AmmoCategoryDef def, Pawn pawn = null)
 		{
-			for (int i = 0; i < apparel.KitComp.Bags.Count; i++)
+			foreach (AmmoSlot bag in apparel.KitComp.Bags)
 			{
-				string ammoDef = def.weightList.Any()
-					? def.ammoDefs[GetRandomWeightedIndex(def.weightList)]
-					: def.ammoDefs.RandomElement();
+				string ammoDef = def.weightList.NullOrEmpty()
+					? def.ammoDefs.RandomElement()
+					: def.ammoDefs[GetRandomWeightedIndex(def.weightList)];
 
-				apparel.KitComp.Bags[i].ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
-				if (apparel.KitComp.Bags[i].ChosenAmmo != null)
+				bag.ChosenAmmo = AvailableAmmo.FirstOrDefault(x => x.defName == ammoDef);
+				if (bag.ChosenAmmo != null)
 				{
-					apparel.KitComp.Bags[i].MaxCount = apparel.KitComp.Props.ammoCapacity[i];
-					apparel.KitComp.Bags[i].Count =
-						(int)(Rand.Range(apparel.KitComp.Props.ammoCapacity[i] *
-						                 (Settings.Settings.Range.min / 100f),
-							      apparel.KitComp.Props.ammoCapacity[i]) *
-						      (Settings.Settings.Range.max / 100f));
+					bag.MaxCount = bag.Capacity;
+					bag.Count = (int)(Rand.Range(bag.Capacity * (Settings.Settings.Range.min / 100f),
+						                  bag.Capacity) *
+					                  (Settings.Settings.Range.max / 100f));
 
 					if (pawn != null)
 					{
@@ -281,103 +290,84 @@ namespace Ammunition.Logic
 		{
 			try
 			{
-				if ((p.RaceProps.IsMechanoid /*&& !Settings.Settings.UseMechanoidAmmo*/) ||
-				    (p.RaceProps.Animal /*&& !Settings.Settings.UseAnimalAmmo*/))
+				if (p.RaceProps == null || p.RaceProps.IsMechanoid || p.RaceProps.Animal)
 				{
 					return;
 				}
-				
+
 				if (p.apparel == null || p.equipment == null)
 				{
 					return;
 				}
-				
-				if (p.equipment.Primary == null)
+
+				ThingDef weaponDef = p.equipment.Primary?.def;
+				VerbProperties verb = weaponDef?.Verbs?.FirstOrDefault(
+					x => x.verbClass.IsSubclassOf(typeof(Verb_LaunchProjectile)));
+
+				if (weaponDef == null || verb == null)
 				{
 					return;
 				}
-				
+
 				Kit apparel = null;
-				if (p.apparel.WornApparelCount > 0)
+				//Try find if pawn already have a kit equipped.
+				if (p.apparel.AnyApparel)
 				{
 					apparel = (Kit)p.apparel.WornApparel.FirstOrDefault(x => x.TryGetComp<KitComponent>() != null);
 				}
 
-				IEnumerable<AmmoCategoryDef> categories = AmmoCategoryDefs.Where(x =>
+				var categories = AmmoCategoryDefs.Where(x =>
 						Settings.Settings.CategoryWeaponDictionary.TryGetValue
 							(x.defName, out Dictionary<string, bool> wep) &&
-						wep != null &&
-						wep.TryGetValue(p.equipment.Primary.def.defName, out bool res) &&
+						!wep.NullOrEmpty() &&
+						wep.TryGetValue(weaponDef.defName, out bool res) &&
 						res)
 					.ToList();
 
-				if (!categories.Any())
+				if (categories.NullOrEmpty())
 				{
 					return;
 				}
 
+				// We have a kit on said pawn already
 				if (apparel != null)
 				{
 					LoadSpawnedKit(apparel, categories.RandomElement(), p);
 					return;
 				}
 
-				//If not already wearing kit.
-				var sorted = AvailableKits
+				// Find a suitable kit to equip
+				ThingDef kit = null;
+				var wearableKits = AvailableKits
 					.Where(y => y.GetCompProperties<CompProps_Kit>().canBeGenerated &&
 					            p.apparel.CanWearWithoutDroppingAnything(y))
-					.OrderBy(x => x.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum())
 					.ToList();
 
-				if (sorted.NullOrEmpty())
+				if (wearableKits.NullOrEmpty())
 				{
 					Log.Message("LTS_Ammo - No kits available for pawn");
 					return;
 				}
 
-				ThingDef kit = null;
 				if (!p.ageTracker.Adult)
 				{
-					kit = sorted.Where(t => t.apparel.developmentalStageFilter.HasFlag
+					kit = wearableKits.Where(t => t.apparel.developmentalStageFilter.HasFlag
 							(DevelopmentalStage.Child))
 						.RandomElement();
 				}
-				else if (Settings.Settings.UseAmmoPerBullet &&
-				         p.equipment.Primary.def.Verbs.FirstOrDefault
-					         (x => x.verbClass == typeof(Verb_LaunchProjectile)) !=
-				         null)
+				else if (Settings.Settings.UseAmmoPerBullet && verb.burstShotCount > 1)
 				{
-					int burstCount = p.equipment.Primary.def.Verbs
-						.FirstOrDefault(x => x.verbClass == typeof(Verb_LaunchProjectile))
-						.burstShotCount;
-
-					if (burstCount > 1)
-					{
-						kit = sorted.FirstOrDefault(y =>
-							y.GetCompProperties<CompProps_Kit>().ammoCapacity.Sum() / burstCount > 20);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < sorted.Count(); i++)
-					{
-						if (!Rand.Bool)
-						{
-							continue;
-						}
-
-						kit = sorted[i];
-						break;
-					}
+					kit = wearableKits.FirstOrDefault(
+						y => y.GetCompProperties<CompProps_Kit>()?.ammoCapacity?.Sum() / verb.burstShotCount > 20);
 				}
 
 				if (kit == null)
 				{
-					kit = sorted.First();
+					kit = wearableKits.RandomElement();
 				}
 
 				apparel = (Kit)ThingMaker.MakeThing(kit,
-					GenStuff.AllowedStuffsFor(kit).RandomElement());
+					GenStuff.AllowedStuffsFor(kit)?.RandomElement());
 
 				if (apparel == null)
 				{
@@ -389,7 +379,10 @@ namespace Ammunition.Logic
 			}
 			catch (Exception ex)
 			{
-				Log.Error("LTS_EquipPawn error, contact LTS with this! - " + ex.Message);
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("LTS_EquipPawn error, contact LTS with this! - " + ex.Message);
+				}
 			}
 		}
 
@@ -519,7 +512,7 @@ namespace Ammunition.Logic
 					Settings.Settings.BagSettingsDictionary.Add(def.defName, intList);
 					changes = true;
 				}
-				
+
 				ResetHyperlinks();
 				if (changes)
 				{
@@ -528,26 +521,26 @@ namespace Ammunition.Logic
 			}
 			catch (Exception ex)
 			{
-				Log.Error("Error initializing Ammunition Framework: " + ex.Message);
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("Error initializing Ammunition Framework: " + ex.Message);
+				}
 			}
 		}
 
 		private static void GenerateLists()
 		{
 			AmmoCategoryDefs = DefDatabase<AmmoCategoryDef>.AllDefsListForReading;
-			AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading.Where(x =>
-					x.IsWeaponUsingProjectiles &&
-					x.HasComp(typeof(CompEquippable)) &&
-					x.IsWithinCategory(ThingCategoryDefOf.Weapons) &&
-					!x.IsApparel &&
-					!x.IsBuildingArtificial)
+			AvailableProjectileWeapons = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(IsViableWeaponDef)
 				.ToList();
 
 			AvailableAmmo = DefDatabase<ThingDef>.AllDefsListForReading
 				.Where(x => x.HasModExtension<AmmunitionExtension>())
 				.ToList();
 
-			AvailableKits = DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.HasComp(typeof(KitComponent)))
+			AvailableKits = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(x => x.HasComp(typeof(KitComponent)))
 				.ToList();
 		}
 
@@ -625,6 +618,85 @@ namespace Ammunition.Logic
 			}
 		}
 
+		internal static void SaveAmmoDefault()
+		{
+			try
+			{
+				if (Settings.Settings.CategoryWeaponDictionary == null ||
+				    Settings.Settings.ExemptionWeaponDictionary == null)
+				{
+					return;
+				}
+
+				string path = Path.Combine(GenFilePaths.ConfigFolderPath + "/ammoDefault.lts");
+				var file = new SaveFile()
+				{
+					Categories = Settings.Settings.CategoryWeaponDictionary,
+					Exemptions = Settings.Settings.ExemptionWeaponDictionary
+				};
+
+				var bf = new BinaryFormatter();
+				using (var stream =
+				       new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+				{
+					bf.Serialize(stream, file);
+				}
+
+				string pathReadable = Path.Combine(GenFilePaths.ConfigFolderPath + "/ammoLTSReadable.txt");
+				using (var writer = new StreamWriter(pathReadable))
+				{
+					foreach (KeyValuePair<string, Dictionary<string, bool>> dictionary
+					         in Settings.Settings.CategoryWeaponDictionary)
+					{
+						writer.WriteLine("Category: <" + dictionary.Key + ">");
+						foreach (KeyValuePair<string, bool> weaponDef in dictionary.Value.Where(weaponDef =>
+							         weaponDef.Value.Equals(true)))
+						{
+							writer.WriteLine("<" + weaponDef.Key + ">");
+						}
+						writer.WriteLine();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("Error saving ammo defaults file! " + ex.Message);
+				}
+			}
+		}
+
+		internal static void LoadAmmoDefault()
+		{
+			try
+			{
+				string path = Path.Combine(GenFilePaths.ConfigFolderPath + "/ammoDefault.lts");
+				if (!File.Exists(path))
+				{
+					return;
+				}
+
+				SaveFile file;
+				var bf = new BinaryFormatter();
+				using (var stream = new FileStream(path, FileMode.Open))
+				{
+					stream.Seek(0, SeekOrigin.Begin);
+					file = (SaveFile)bf.Deserialize(stream);
+				}
+
+				Settings.Settings.ExemptionWeaponDictionary = file.Exemptions;
+				Settings.Settings.CategoryWeaponDictionary = file.Categories;
+			}
+			catch (Exception ex)
+			{
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("Error loading ammo defaults file! " + ex.Message);
+				}
+			}
+		}
+
 		internal static void Save()
 		{
 			try
@@ -653,7 +725,10 @@ namespace Ammunition.Logic
 			}
 			catch (Exception ex)
 			{
-				Log.Error("Error saving ammo! " + ex.Message);
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("Error saving ammo! " + ex.Message);
+				}
 			}
 		}
 
@@ -681,7 +756,10 @@ namespace Ammunition.Logic
 			}
 			catch (Exception ex)
 			{
-				Log.Error("Error loading ammo! " + ex.Message);
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("Error loading ammo! " + ex.Message);
+				}
 			}
 		}
 
@@ -703,13 +781,15 @@ namespace Ammunition.Logic
 					return true;
 				}
 
+				// Currently, Mechanoids and animals can't wear kits.
 				if ((pawn.RaceProps.IsMechanoid /*&& !Settings.Settings.UseMechanoidAmmo*/) ||
 				    (pawn.RaceProps.Animal /*&& !Settings.Settings.UseAnimalAmmo*/))
 				{
 					return true;
 				}
 
-				if (pawn.apparel == null || weapon.def.IsMeleeWeapon || !AmmoCategoryDefs.Any())
+				// Not every pawn can wear apparel, hence can't wear kits thus should be exempt.
+				if (pawn.apparel == null)
 				{
 					return true;
 				}
@@ -720,6 +800,8 @@ namespace Ammunition.Logic
 				}
 
 				//If all prior "fails", this means the weapon indeed need ammo.
+
+				//If the pawn is naked, can't be wearing a kit.
 				if (!pawn.apparel.AnyApparel)
 				{
 					return false;
@@ -741,6 +823,7 @@ namespace Ammunition.Logic
 						     WeaponDefCanUseAmmoDef(
 							     weapon.def.defName, t.ChosenAmmo.defName));
 
+					//Does this kit contain viable ammo in a slot?
 					if (ammoSlot == null)
 					{
 						continue;
@@ -763,26 +846,45 @@ namespace Ammunition.Logic
 					return true;
 				}
 
+				//No ammo available
 				kitComp = null;
 				return false;
 			}
 			catch (Exception ex)
 			{
-				if (kitComp != null)
+				if (Settings.Settings.DebugLogs)
 				{
-					Log.Error(kitComp.parent.def.defName + "have components but not viable.");
-				}
+					if (kitComp != null)
+					{
+						Log.Error(kitComp.parent.def.defName + "have components but not viable.");
+						kitComp = null;
+					}
 
-				Log.Error("Failure in getUsableKitCompForWeapon: " + ex.Message);
+					Log.Error("Failure in getUsableKitCompForWeapon: " + ex.Message);
+				}
 			}
 
 			kitComp = null;
 			return false;
 		}
 
+		/// <summary>
+		/// If a weapon is monitored by this mod and if so, whether it is exempt or not.
+		/// </summary>
+		/// <param name="weaponDefName">The weapon def in question</param>
+		/// <returns>true is this weapon can fire due to being exempt</returns>
 		public static bool IsExempt(string weaponDefName)
 		{
 			return !Settings.Settings.ExemptionWeaponDictionary.TryGetValue(weaponDefName, out bool exempt) || exempt;
+		}
+
+		private static bool IsViableWeaponDef(ThingDef weapon)
+		{
+			return !weapon.IsMeleeWeapon &&
+			       !weapon.IsBuildingArtificial &&
+			       !weapon.Verbs.Any(y => y.verbClass == typeof(Verb_ShootOneUse)) &&
+			       weapon.HasComp(typeof(CompEquippable)) &&
+			       weapon.IsWithinCategory(ThingCategoryDefOf.Weapons);
 		}
 
 		public static List<AmmoCategoryDef> AvailableAmmoForWeapon(string weaponDefName)

@@ -7,11 +7,14 @@ using Ammunition.Designators;
 using Ammunition.Language;
 using Ammunition.Logic;
 using HarmonyLib;
+using KTrie;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;
 using JobDefOf = Ammunition.Defs.JobDefOf;
+
+// ReSharper disable InconsistentNaming
 
 namespace Ammunition.Harmony
 {
@@ -27,15 +30,14 @@ namespace Ammunition.Harmony
 			harmony.Patch(AccessTools.Method(typeof(VerbTracker), "CreateVerbTargetCommand"), null,
 				new HarmonyMethod(typeof(Harmony).GetMethod("CreateVerbTargetCommand_PostFix")));
 
-			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "Available"), null,
+			harmony.Patch(AccessTools.Method(typeof(Verb), "Available"), null,
 				new HarmonyMethod(typeof(Harmony).GetMethod("Available_PostFix")));
 
-			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "TryCastShot"),
-				new HarmonyMethod(typeof(Harmony).GetMethod("TryCastShot_PreFix")));
+			harmony.Patch(AccessTools.Method(typeof(Verb), "TryCastNextBurstShot"),
+				new HarmonyMethod(typeof(Harmony).GetMethod("TryCastNextBurstShot_PreFix")));
 
-			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "WarmupComplete"),
-				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PreFix")),
-				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PostFix")));
+			harmony.Patch(AccessTools.Method(typeof(Verb), "WarmupComplete"),
+				new HarmonyMethod(typeof(Harmony).GetMethod("WarmupComplete_PreFix")));
 
 			harmony.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile"),
 				new HarmonyMethod(typeof(Harmony).GetMethod("Projectile_PreFix")));
@@ -71,28 +73,7 @@ namespace Ammunition.Harmony
 				Log.Message(e.Message);
 			}
 		}
-
-		public static void Available_PostFix(ref bool __result, Verb_LaunchProjectile __instance)
-		{
-			try
-			{
-				if (!__result)
-				{
-					return;
-				}
-
-				__result = AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, false);
-				if (!__result && __instance.CasterPawn.CurJob.def == RimWorld.JobDefOf.Hunt)
-				{
-					__instance.CasterPawn.jobs.EndCurrentJob(JobCondition.Incompletable);
-				}
-			}
-			catch (Exception e)
-			{
-				Log.Message(e.Message);
-			}
-		}
-
+		
 		public static void CreateVerbTargetCommand_PostFix(Thing ownerThing,
 			Verb verb,
 			Command_VerbTarget __result)
@@ -115,14 +96,39 @@ namespace Ammunition.Harmony
 			}
 		}
 
-		[HarmonyPriority(150)]
-		public static bool WarmupComplete_PreFix(Verb_LaunchProjectile __instance, out KitComponent __state)
+		public static void Available_PostFix(ref bool __result, Verb __instance)
 		{
-			__state = null;
 			try
 			{
-				return !Settings.Settings.UseAmmoPerBullet ||
-				       AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out __state, true);
+				if (!__result || __instance.IsMeleeAttack)
+				{
+					return;
+				}
+
+				__result = AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, false);
+				if (!__result && __instance.CasterPawn.CurJob.def == RimWorld.JobDefOf.Hunt)
+				{
+					//Cancel the hunt if not viable.
+					__instance.CasterPawn.jobs.EndCurrentJob(JobCondition.Incompletable);
+				}
+			}
+			catch (Exception e)
+			{
+				Log.Message(e.Message);
+			}
+		}
+
+		[HarmonyPriority(150)]
+		public static bool WarmupComplete_PreFix(Verb __instance)
+		{
+			try
+			{
+				if (__instance.IsMeleeAttack)
+				{
+					return true;
+				}
+				return AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource,
+					out _, !Settings.Settings.UseAmmoPerBullet);
 			}
 			catch (Exception e)
 			{
@@ -132,40 +138,41 @@ namespace Ammunition.Harmony
 		}
 
 		[HarmonyPriority(150)]
-		public static bool TryCastShot_PreFix(ref bool __result, Verb_LaunchProjectile __instance)
+		public static bool TryCastNextBurstShot_PreFix(Verb __instance)
 		{
 			try
 			{
-				__result = Settings.Settings.UseAmmoPerBullet
-					? AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, false)
-					: AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource, out _, true);
+				if (__instance.IsMeleeAttack)
+				{
+					return true;
+				}
 
-				return __result;
+				bool canFire = AmmoLogic.AmmoCheck(__instance.CasterPawn, __instance.EquipmentSource,
+					out KitComponent comp,
+					Settings.Settings.UseAmmoPerBullet);
+
+				if (!canFire || comp == null)
+				{
+					return canFire;
+				}
+
+				int burst = comp.LastUsedAmmo.GetModExtension<AmmunitionExtension>().burstCount;
+				if (burst <= 1)
+				{
+					return true;
+				}
+
+				for (int i = 1; i < burst; i++)
+				{
+					Traverse.Create(__instance).Method("TryCastShot").GetValue();
+				}
+
+				return true;
 			}
 			catch (Exception e)
 			{
 				Log.Message(e.Message);
 				return true;
-			}
-		}
-
-		[HarmonyPriority(150)]
-		public static void WarmupComplete_PostFix(Verb_LaunchProjectile __instance, KitComponent __state)
-		{
-			if (__state == null)
-			{
-				return;
-			}
-
-			int burst = __state.LastUsedAmmo.GetModExtension<AmmunitionExtension>().burstCount;
-			if (burst <= 1)
-			{
-				return;
-			}
-
-			for (int i = 1; i < burst; i++)
-			{
-				Traverse.Create(__instance).Method("TryCastShot").GetValue();
 			}
 		}
 
@@ -194,7 +201,7 @@ namespace Ammunition.Harmony
 				return true;
 			}
 		}
-		
+
 		public static void GeneratePawn_PostFix(Pawn __result)
 		{
 			if (__result?.apparel != null)

@@ -31,6 +31,7 @@ namespace Ammunition.Language {
         public static string AmmoCategoryOptions(string cat) => "LTSAmmoCategoryOptions".Translate(cat);
         public static string AmmoUsageOptions => "LTSAmmoUsageOptions".Translate();
         public static string AmmoSearchOptions => "LTSAmmoSearchOptions".Translate();
+        public static string AmmoDebugging => "LtsAmmoDebugging".Translate();
         public static string HideMultipleGizmos => "LTSHideMultipleGizmos".Translate();
         public static string HideMultipleGizmosDesc => "LTSHideMultipleGizmosDesc".Translate();
         public static string LtsUseWiderGizmo => "LTSUseWiderGizmo".Translate();
@@ -44,5 +45,12 @@ namespace Ammunition.Language {
         public static string SettingsGeneral => "LTSSettingsGeneral".Translate();
         public static string SettingsKitsConfiguration => "LTSSettingsKitsConfiguration".Translate();
         public static string SettingsAmmoConfiguration => "LTSSettingsAmmoConfiguration".Translate();
+        public static string SettingsSaveAsDefault => "LTSSettingsSaveAsDefault".Translate();
+        public static string SettingsSaveAsDefaultDesc => "LTSSettingsSaveAsDefaultDesc".Translate();
+        public static string SettingsLoadDefault => "LTSSettingsLoadDefault".Translate();
+        public static string SettingsLoadDefaultDesc => "LTSSettingsLoadDefaultDesc".Translate();
+        public static string SettingsResetAll => "LTSSettingsResetAll".Translate();
+        public static string Ok => "LTSOk".Translate();
+        public static string Cancel => "LTSCancel".Translate();
     }
 }

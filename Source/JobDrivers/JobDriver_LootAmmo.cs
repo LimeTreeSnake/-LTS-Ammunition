@@ -16,38 +16,42 @@ namespace Ammunition.JobDrivers
 		{
 			this.FailOnDestroyedOrNull(TargetIndex.A);
 			this.FailOnAggroMentalState(TargetIndex.A);
-			this.FailOn(() => !Logic.AmmoLogic.CanBeLootedByColony(base.TargetThingA));
-			Toil toil = new Toil();
-			toil.initAction = delegate
+			this.FailOn(() => !Logic.AmmoLogic.CanBeLootedByColony(this.TargetThingA));
+			var toil = new Toil
 			{
-				pawn.pather.StartPath(base.TargetThingA, PathEndMode.ClosestTouch);
+				initAction = delegate
+				{
+					this.pawn.pather.StartPath(this.TargetThingA, PathEndMode.ClosestTouch);
+				},
+				defaultCompleteMode = ToilCompleteMode.PatherArrival
 			};
 
-			toil.defaultCompleteMode = ToilCompleteMode.PatherArrival;
 			toil.FailOnDespawnedNullOrForbidden(TargetIndex.A);
 			yield return toil;
 			yield return Toils_General.Wait(100).WithProgressBarToilDelay(TargetIndex.A);
 
-			Toil toil2 = new Toil();
-			toil2.initAction = delegate
+			var toil2 = new Toil
 			{
-				Thing thing = job.targetA.Thing;
-				Map.designationManager.DesignationOn(thing, Defs.DesignationDefOf.LTS_LootAmmo)?.Delete();
-				Logic.AmmoLogic.LootAmmo(thing);
-				pawn.records.Increment(Defs.RecordDefOf.LTS_BodiesLooted);
+				initAction = delegate
+				{
+					Thing thing = this.job.targetA.Thing;
+					this.Map.designationManager.DesignationOn(thing, Defs.DesignationDefOf.LTS_LootAmmo)?.Delete();
+					Logic.AmmoLogic.LootAmmo(thing);
+					this.pawn.records.Increment(Defs.RecordDefOf.LTS_BodiesLooted);
+				},
+				defaultCompleteMode = ToilCompleteMode.Instant
 			};
 
-			toil2.defaultCompleteMode = ToilCompleteMode.Instant;
 			yield return toil2;
 		}
 
 		public override object[] TaleParameters()
 		{
-			Corpse corpse = base.TargetA.Thing as Corpse;
+			var corpse = this.TargetA.Thing as Corpse;
 			return new object[2]
 			{
-				pawn,
-				(corpse != null) ? corpse.InnerPawn : base.TargetA.Thing
+				this.pawn,
+				(corpse != null) ? corpse.InnerPawn : this.TargetA.Thing
 			};
 		}
 	}

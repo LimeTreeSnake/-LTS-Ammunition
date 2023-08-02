@@ -12,6 +12,7 @@ namespace Ammunition.Defs {
         public List<int> weightList;
         public AmmoTypes ammoType;
         public bool autoAssignable = true;
+        public int ammoWeight = 1;
     }
 
     [DefOf]

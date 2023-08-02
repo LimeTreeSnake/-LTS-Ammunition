@@ -14,7 +14,6 @@ namespace Ammunition.Gizmos
 	public sealed class GizmoAmmunition : Gizmo
 	{
 		private readonly KitComponent _kitComp;
-		private Map CurrentMap => _kitComp?.parent.MapHeld;
 		private const float Margin = 2f;
 		private const float UtilityWidth = 34f;
 		private const float ControlsWidth = 150;
@@ -54,7 +53,7 @@ namespace Ammunition.Gizmos
 
 		private static float GetColumnWidth()
 		{
-			return (float)(!Settings.Settings.UseCompactGizmo ? 225f : 150f);
+			return !Settings.Settings.UseCompactGizmo ? 225f : 150f;
 		}
 
 		public GizmoAmmunition(KitComponent comp)
@@ -138,7 +137,7 @@ namespace Ammunition.Gizmos
 							ref _draggingBar,
 							fillPercent,
 							ref max,
-							_ammoBandPercentages, 16);
+							_ammoBandPercentages, 10);
 
 						if (Math.Abs(slot.MaxCount - max) > 0.01f)
 						{
@@ -176,7 +175,10 @@ namespace Ammunition.Gizmos
 			}
 			catch (Exception ex)
 			{
-				Log.Error("LTS_Ammo framework GizmoOnGUI: " + ex.Message);
+				if (Settings.Settings.DebugLogs)
+				{
+					Log.Error("LTS_Ammo framework GizmoOnGUI: " + ex.Message);
+				}
 			}
 
 			Text.Anchor = TextAnchor.UpperLeft;

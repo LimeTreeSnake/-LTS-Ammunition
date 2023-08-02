@@ -14,22 +14,22 @@ namespace Ammunition.Designators {
         protected override DesignationDef Designation => Defs.DesignationDefOf.LTS_LootAmmo;
 
         public Designator_LootAmmo() {
-            defaultLabel = Language.Translate.DesignatorLootAmmo;
-            defaultDesc = Language.Translate.DesignatorLootAmmoDesc;
-            icon = ContentFinder<Texture2D>.Get("Icons/AmmoIcon", true);
-            soundDragSustain = SoundDefOf.Designate_DragStandard;
-            soundDragChanged = SoundDefOf.Designate_DragStandard_Changed;
-            useMouseIcon = true;
-            soundSucceeded = SoundDefOf.Designate_Claim;
+	        this.defaultLabel = Language.Translate.DesignatorLootAmmo;
+	        this.defaultDesc = Language.Translate.DesignatorLootAmmoDesc;
+	        this.icon = ContentFinder<Texture2D>.Get("Icons/AmmoIcon", true);
+	        this.soundDragSustain = SoundDefOf.Designate_DragStandard;
+	        this.soundDragChanged = SoundDefOf.Designate_DragStandard_Changed;
+	        this.useMouseIcon = true;
+	        this.soundSucceeded = SoundDefOf.Designate_Claim;
         }
         public override AcceptanceReport CanDesignateThing(Thing t) {
-            if (t == null || Map.designationManager.DesignationOn(t, Designation) != null) {
+            if (t == null || this.Map.designationManager.DesignationOn(t, Designation) != null) {
                 return false;
             }
             return Logic.AmmoLogic.CanBeLootedByColony(t);
         }
         public override AcceptanceReport CanDesignateCell(IntVec3 c) {
-            if (!c.InBounds(Map)) {
+            if (!c.InBounds(this.Map)) {
                 return false;
             }
             if (!LootablesInCell(c).Any<Thing>()) {
@@ -43,19 +43,18 @@ namespace Ammunition.Designators {
             }
         }
         public override void DesignateThing(Thing t) {
-            Map.designationManager.AddDesignation(new Designation(t, Designation));
+	        this.Map.designationManager.AddDesignation(new Designation(t, Designation));
             StrippableUtility.CheckSendStrippingImpactsGoodwillMessage(t);
         }
         private IEnumerable<Thing> LootablesInCell(IntVec3 c) {
-            if (c.Fogged(Map)) {
+            if (c.Fogged(this.Map)) {
                 yield break;
             }
 
-            List<Thing> thingList = c.GetThingList(Map);
-            for (int i = 0; i < thingList.Count; i++) {
-                if (CanDesignateThing(thingList[i]).Accepted) {
-                    yield return thingList[i];
-                }
+            List<Thing> thingList = c.GetThingList(this.Map);
+            foreach (Thing t in thingList.Where(t => CanDesignateThing(t).Accepted))
+            {
+	            yield return t;
             }
         }
 

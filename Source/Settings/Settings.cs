@@ -47,6 +47,7 @@ namespace Ammunition.Settings
 		private static bool _hideMultipleGizmos = true;
 		private static bool _useCompactGizmo;
 		private static bool _npcUseAmmo = true;
+		private static bool _debugLogs;
 		private static IntRange _range = new IntRange(30, 60);
 		private static AmmoCategoryDef _chosenCategory;
 		private static ThingDef _chosenKit;
@@ -73,13 +74,14 @@ namespace Ammunition.Settings
 
 		public static bool HideMultipleGizmos => _hideMultipleGizmos;
 		public static IntRange Range => _range;
-
 		public static bool UseAmmoPerBullet => _useAmmoPerBullet;
-
 		public static bool UseCompactGizmo => _useCompactGizmo;
 		public static bool NpcUseAmmo => _npcUseAmmo;
+		public static bool DebugLogs => _debugLogs;
 
 		public static Dictionary<string, Dictionary<string, bool>> CategoryWeaponDictionary;
+
+		//Contains all viable weapons monitored, if it's not in this list, then it's not a viable weapon.
 		public static Dictionary<string, bool> ExemptionWeaponDictionary;
 		public static Dictionary<string, List<int>> BagSettingsDictionary;
 
@@ -89,6 +91,7 @@ namespace Ammunition.Settings
 			Scribe_Values.Look(ref _hideMultipleGizmos, "HideMultipleGizmos", true);
 			Scribe_Values.Look(ref _useCompactGizmo, "UseCompactGizmo");
 			Scribe_Values.Look(ref _npcUseAmmo, "NpcUseAmmo", true);
+			Scribe_Values.Look(ref _debugLogs, "DebugLogs", false);
 			Scribe_Values.Look(ref _range, "Range", new IntRange(30, 60));
 			base.ExposeData();
 		}
@@ -117,6 +120,7 @@ namespace Ammunition.Settings
 			_hideMultipleGizmos = true;
 			_useCompactGizmo = false;
 			_npcUseAmmo = true;
+			_debugLogs = false;
 			_range = new IntRange(30, 60);
 			AmmoLogic.ResetInitialize();
 		}
@@ -165,7 +169,8 @@ namespace Ammunition.Settings
 
 				if (Widgets.ButtonText(topSettingsRectRight.RightHalf().BottomHalf(), Translate.DefaultSettings))
 				{
-					Reset();
+					var dialogConfirm = new DialogConfirm(Reset);
+					Find.WindowStack.Add(dialogConfirm);
 					_changesMade = true;
 				}
 
@@ -217,6 +222,14 @@ namespace Ammunition.Settings
 					}
 
 					TooltipHandler.TipRegion(npcUsesAmmoRect, Translate.NpcUseAmmoDesc);
+
+					list.Gap(2);
+					Rect debuggingRect = list.GetRect(_lineHeight).LeftHalf().LeftHalf();
+					Widgets.CheckboxLabeled(debuggingRect, Translate.AmmoDebugging, ref _debugLogs);
+					if (Mouse.IsOver(debuggingRect))
+					{
+						Widgets.DrawHighlight(debuggingRect);
+					}
 
 					list.Gap(2);
 					Rect npcSpawnAmmoLabelRect = list.GetRect(_lineHeight);
@@ -295,10 +308,31 @@ namespace Ammunition.Settings
 				// Ammo Configuration
 				else if (_page3)
 				{
+
 					Text.Font = GameFont.Medium;
 					Rect headerRect = list.GetRect(_lineHeight * 1.5f);
-					Widgets.Label(headerRect, Translate.SettingsAmmoConfiguration);
+					headerRect.SplitVertically(inRect.width / 1.5f,
+						out Rect headerRectLeft,
+						out Rect headerRectRight);
+
+					Widgets.Label(headerRectLeft, Translate.SettingsAmmoConfiguration);
 					Text.Font = GameFont.Small;
+
+					if (Widgets.ButtonText(headerRectRight.LeftHalf().ContractedBy(0, Margin),
+						    Translate.SettingsSaveAsDefault))
+					{
+						var dialogConfirm = new DialogConfirm(AmmoLogic.SaveAmmoDefault);
+						Find.WindowStack.Add(dialogConfirm);
+						_changesMade = true;
+					}
+
+					if (Widgets.ButtonText(headerRectRight.RightHalf().ContractedBy(0, Margin),
+						    Translate.SettingsLoadDefault))
+					{
+						var dialogConfirm = new DialogConfirm(AmmoLogic.LoadAmmoDefault);
+						Find.WindowStack.Add(dialogConfirm);
+						_changesMade = true;
+					}
 
 					if (AmmoLogic.AmmoCategoryDefs.Any())
 					{
@@ -433,7 +467,7 @@ namespace Ammunition.Settings
 						Text.Anchor = TextAnchor.MiddleLeft;
 						Widgets.Label(filterSearchTextRect, Translate.AmmoSearchOptions);
 						Text.Anchor = TextAnchor.UpperLeft;
-						
+
 						string tempSearchFilter = _searchFilter;
 						_searchFilter = Widgets.TextField(filterSearchInputRect, _searchFilter);
 						bool tempNeolithic = _neolithic;
@@ -613,7 +647,7 @@ namespace Ammunition.Settings
 
 							Text.Font = GameFont.Tiny;
 							Text.Anchor = TextAnchor.MiddleRight;
-	
+
 							if (_setAllCatFalse)
 							{
 								dic.SetOrAdd(thingDef.defName, false);
@@ -624,8 +658,10 @@ namespace Ammunition.Settings
 								dic.SetOrAdd(thingDef.defName, true);
 								AmmoLogic.ResetHyperLinksForWeapon(thingDef);
 							}
+
 							Widgets.Label(categoryUsageLabelRect,
 								Translate.AmmoCategoryOptions(_chosenCategory?.LabelCap));
+
 							if (Widgets.ButtonImage(categoryUsageIconRect, val ? TrueIcon : FalseIcon))
 							{
 								val = !val;
@@ -633,7 +669,7 @@ namespace Ammunition.Settings
 								AmmoLogic.ResetHyperLinksForWeapon(thingDef);
 								_changesMade = true;
 							}
-							
+
 							if (_setAllAmmoFalse)
 							{
 								ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, true);
@@ -644,6 +680,7 @@ namespace Ammunition.Settings
 								ExemptionWeaponDictionary.SetOrAdd(thingDef.defName, false);
 								AmmoLogic.ResetHyperLinksForWeapon(thingDef);
 							}
+
 							Widgets.Label(ammoUsageLabelRect, Translate.AmmoUsageOptions);
 							if (Widgets.ButtonImage(ammoUsageIconRect, val2 ? FalseIcon : TrueIcon))
 							{
@@ -694,7 +731,10 @@ namespace Ammunition.Settings
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex.Message);
+				if (DebugLogs)
+				{
+					Log.Error(ex.Message);
+				}
 			}
 		}
 
@@ -708,7 +748,8 @@ namespace Ammunition.Settings
 					AmmoCategoryDef ammo = enumerator.Current;
 					yield return new Widgets.DropdownMenuElement<AmmoCategoryDef>
 					{
-						option = new FloatMenuOption(ammo?.label, delegate { _chosenCategory = ammo; }), payload = ammo
+						option = new FloatMenuOption(ammo?.LabelCap, delegate { _chosenCategory = ammo; }),
+						payload = ammo
 					};
 				}
 			}
@@ -723,7 +764,7 @@ namespace Ammunition.Settings
 					ThingDef kit = enumerator.Current;
 					yield return new Widgets.DropdownMenuElement<ThingDef>
 					{
-						option = new FloatMenuOption(kit?.label, delegate { _chosenKit = kit; }), payload = kit
+						option = new FloatMenuOption(kit?.LabelCap, delegate { _chosenKit = kit; }), payload = kit
 					};
 				}
 			}
