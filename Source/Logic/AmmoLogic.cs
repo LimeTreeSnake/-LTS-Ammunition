@@ -366,8 +366,9 @@ namespace Ammunition.Logic
 					kit = wearableKits.RandomElement();
 				}
 
+				ThingDef stuff = GenStuff.AllowedStuffsFor(kit)?.RandomElement();
 				apparel = (Kit)ThingMaker.MakeThing(kit,
-					GenStuff.AllowedStuffsFor(kit)?.RandomElement());
+					stuff ?? ThingDefOf.Cloth);
 
 				if (apparel == null)
 				{
@@ -654,6 +655,7 @@ namespace Ammunition.Logic
 						{
 							writer.WriteLine("<" + weaponDef.Key + ">");
 						}
+
 						writer.WriteLine();
 					}
 				}
@@ -885,6 +887,34 @@ namespace Ammunition.Logic
 			       !weapon.Verbs.Any(y => y.verbClass == typeof(Verb_ShootOneUse)) &&
 			       weapon.HasComp(typeof(CompEquippable)) &&
 			       weapon.IsWithinCategory(ThingCategoryDefOf.Weapons);
+		}
+
+		public static void FixCategoryWeaponDictionaries()
+		{
+			foreach (ThingDef weaponDef in AvailableProjectileWeapons)
+			{
+				bool hasAmmo = false;
+				foreach (KeyValuePair<string, Dictionary<string, bool>> categoryDictionaries in
+				         Settings.Settings.CategoryWeaponDictionary)
+				{
+					categoryDictionaries.Value.TryGetValue(weaponDef.defName, out bool needAmmo);
+					if (needAmmo)
+					{
+						hasAmmo = true;
+					}
+				}
+
+				if (!hasAmmo)
+				{
+					Settings.Settings.ExemptionWeaponDictionary.SetOrAdd(weaponDef.defName, true);
+				}
+				AmmoLogic.ResetHyperLinksForWeapon(weaponDef);
+			}
+		}
+
+		public static void SetAllCategoriesForWeaponToNotRequireAmmo(string thingDefName)
+		{
+			
 		}
 
 		public static List<AmmoCategoryDef> AvailableAmmoForWeapon(string weaponDefName)

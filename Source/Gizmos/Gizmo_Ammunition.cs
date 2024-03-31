@@ -101,6 +101,11 @@ namespace Ammunition.Gizmos
 							GenUI.DrawTextureWithMaterial(recImage, parms.shrunk ? Command.BGTexShrunk : Command.BGTex,
 								material);
 							Widgets.DrawTextureFitted(recImage, slot.ChosenAmmo.uiIcon, 0.95f);
+							var infoRect = new Rect(recImage.xMax - 22f, recImage.y + 2f, 20, 20);
+							if (Widgets.ButtonImage(infoRect, Settings.Settings.InfoIcon))
+							{
+								Find.WindowStack.Add(new Dialog_InfoCard(slot.ChosenAmmo));
+							}
 						}
 
 						recAmmoGizmo.SplitVerticallyWithMargin(out Rect recLeft, out Rect recRight, out _,
@@ -218,7 +223,9 @@ namespace Ammunition.Gizmos
 							AmmoLogic.EmptyBagAt(ammoSlot, _kitComp.parent.PositionHeld);
 							ammoSlot.MaxCount = ammoSlot.Capacity;
 							ammoSlot.ChosenAmmo = ammoDef;
-						}, ammoDef.uiIcon, ammoDef.uiIconColor),
+						}, 
+							ammoDef.uiIcon, 
+							ammoDef.uiIconColor),
 						payload = ammoDef,
 					};
 				}

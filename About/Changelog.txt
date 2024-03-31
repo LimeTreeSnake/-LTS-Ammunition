@@ -1,4 +1,17 @@
 ﻿[LTS]Ammunition - Framework
+2024-03-29
+    - Updated to 1.5, kept 1.4 as was.
+    - Hovering over ammo in mod settings shows their label and description. This to easier compare ammo vs default damage for possible weapons.
+    - Hovering over weapons in mod settings shows their default projectile base damage. This to easier compare ammo vs default damage for possible weapons.
+        NOTICE: If you have any weapons that have not any default ammo assigned to, know that you can send the "Saved default file" to LTS so that we can add it in future iterations of our mods.
+    - Various bugfixes...
+
+2023-08-08
+    - Hovering over ammo image in mod settings shows label of said ammo.
+    - Added filter options for specific mods (Shows only mods that have weapons that work with this frameworkd.)
+    - Added filter to only show weapons requiring no ammo.
+    - Ammo settings logic linking for "Requires Ammo" and "Can Use". Will auto select Requires ammo -> false if no ammo is selected as an example.
+
 2023-08-02
     - Flipped east image of ammunition bench, was wrong whops.
     - Added size feature to ammo, kits can carry less large ammo if category of ammo is large.

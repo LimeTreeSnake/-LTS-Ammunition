@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <!--==================== Ammunition ======================== -->
+    <ThingDef Name="AmmunitionBase" ParentName="ResourceBase" Abstract="True">
+        <thingClass>Ammunition.Things.Ammo</thingClass>
+        <statBases>
+            <MaxHitPoints>10</MaxHitPoints>
+            <Flammability>1</Flammability>
+            <DeteriorationRate>1.0</DeteriorationRate>
+            <Mass>0.25</Mass>
+        </statBases>
+        <stackLimit>150</stackLimit>
+        <tickerType>Normal</tickerType>
+        <tradeability>All</tradeability>
+        <tradeTags>
+            <li>Ammunition</li>
+        </tradeTags>
+        <thingCategories>
+            <li>Ammunition</li>
+        </thingCategories>
+    </ThingDef>
+</Defs>

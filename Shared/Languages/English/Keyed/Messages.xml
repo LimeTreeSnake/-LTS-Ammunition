@@ -2,19 +2,17 @@
 <LanguageData>
     <!--Mod Settings-->
     <LTSAmmunition>Ammunition</LTSAmmunition>
-    <LTSAmmunitionCategory>Category:</LTSAmmunitionCategory>
     <LTSAvailableAmmoCategory>Configure Category:</LTSAvailableAmmoCategory>
     <LTSAvailableAmmoCategoryDesc>Ammunition in currently selected category:</LTSAvailableAmmoCategoryDesc>
     <LTSAddSlot>Add Slot +</LTSAddSlot>
     <LTSChangeBag>Note: Settings will only be applied to newly created kits.</LTSChangeBag>
     <LTSConfigureKit>Configure Kit:</LTSConfigureKit>
     <LTSBagNumber>Ammo slot {0} | Capacity - </LTSBagNumber>
-    <LTSAmmoFilterOptions>Filter Options:</LTSAmmoFilterOptions>
     <LTSAmmoWeaponsOptions>Weapons:</LTSAmmoWeaponsOptions>
+    <LTSAmmoWeaponsBaseDamage>Base damage:</LTSAmmoWeaponsBaseDamage>
     <LTSAmmoCategoryOptions>Can use {0}?</LTSAmmoCategoryOptions>
     <LTSAmmoUsageOptions>Requires Ammo?</LTSAmmoUsageOptions>
-    <LTSAmmoSearchOptions>Search:</LTSAmmoSearchOptions>
-    <LtsAmmoDebugging>[Dev] Debugging messages</LtsAmmoDebugging>
+    <LTSAmmoFilterAllUnused>No ammo required</LTSAmmoFilterAllUnused>
     <LTSHideMultipleGizmos>Hide multiple kit gizmos</LTSHideMultipleGizmos>
     <LTSHideMultipleGizmosDesc>Whether all kit gizmos should be hidden when more than one pawn is selected.</LTSHideMultipleGizmosDesc>
     <LTSUseWiderGizmo>Use compact kit gizmos</LTSUseWiderGizmo>
@@ -25,24 +23,16 @@
     <LTSNpcUseAmmoDesc>If checked true, enemies and guests will consume ammo upon using their ranged weapons. If false, they don't consume any ammunition. (Do note, they will still need at least 1 useable ammo in their kit which can thus last indefinitely much like how companions work in skyrim.)</LTSNpcUseAmmoDesc>
     <LTSPerBullet>Use 1 ammo per bullet</LTSPerBullet>
     <LTSPerBulletDesc>Whether firing a weapon consumes 1 ammo per bullet fired in a burst(true) or 1 ammo total per burst(false).</LTSPerBulletDesc>
-    <LTSSelectedStandardAmmo>Default</LTSSelectedStandardAmmo>
-    <LTSSettingsGeneral>General Settings</LTSSettingsGeneral>
     <LTSSettingsKitsConfiguration>Kits Configuration</LTSSettingsKitsConfiguration>
     <LTSSettingsAmmoConfiguration>Ammo Configuration</LTSSettingsAmmoConfiguration>
-    <LTSSettingsResetAll>Are you sure?</LTSSettingsResetAll>
     <LTSSettingsSaveAsDefault>Save as default</LTSSettingsSaveAsDefault>
-    <LTSSettingsSaveAsDefaultDesc>Saves to your mod config folder, the current ammuntion setup.</LTSSettingsSaveAsDefaultDesc>
     <LTSSettingsLoadDefault>Load default</LTSSettingsLoadDefault>
-    <LTSSettingsLoadDefaultDesc>Loads from the config folder, the current ammuntion setup.</LTSSettingsLoadDefaultDesc>
-    <LTSOk>OK</LTSOk>
-    <LTSCancel>Cancel</LTSCancel>
 
     <!--Messages-->
     <LTSDropAll>Drop all</LTSDropAll>
     <LTSCanUse>Allow usage</LTSCanUse>
     <LTSNoAmmo>No ammo!</LTSNoAmmo>
     <LTSNoAmmoDesc>Your colonists lack ammo!</LTSNoAmmoDesc>
-    <LTSUnloadKit>Unload kit</LTSUnloadKit>
     <LTSOutOfAmmo>{PAWN_nameDef} have run out of {0}!</LTSOutOfAmmo>
     <LTSDesignatorLootAmmo>Loot ammo</LTSDesignatorLootAmmo>
     <LTSDesignatorLootAmmoDesc>Loot ammo from corpses and the wounded.</LTSDesignatorLootAmmoDesc>
