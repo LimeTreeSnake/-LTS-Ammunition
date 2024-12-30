@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ammunition.Settings;
 
 namespace Ammunition.Logic
 {
@@ -11,6 +9,6 @@ namespace Ammunition.Logic
     {
         public Dictionary<string, Dictionary<string, bool>> Categories;
         public Dictionary<string, bool> Exemptions;
-        public Dictionary<string, List<int>>  Bags;
+        public Dictionary<string, BagSettings>  Bags;
     }
 }

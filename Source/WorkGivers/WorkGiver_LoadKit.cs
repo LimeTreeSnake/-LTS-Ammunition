@@ -1,12 +1,7 @@
-﻿using Ammunition.Components;
-using RimWorld;
-using System;
+﻿using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Ammunition.Logic;
-using Ammunition.Models;
-using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -15,7 +10,6 @@ namespace Ammunition.WorkGivers
 {
 	public class WorkGiver_LoadKit : WorkGiver_Scanner
 	{
-
 		public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
 		{
 			IEnumerable<Things.Kit> list = Logic.AmmoLogic.GetWornKits(pawn);
@@ -41,12 +35,12 @@ namespace Ammunition.WorkGivers
 		{
 			return !t.IsForbidden(pawn) &&
 			       pawn.CanReserve(t, 1, -1, null, forced) &&
-			       AmmoLogic.AvailableAmmo.Contains(t.def);
+			       Settings.Settings.AvailableAmmo.Contains(t.def);
 		}
 
 		public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
 		{
-			Job job = JobMaker.MakeJob(Defs.JobDefOf.LTS_FetchAmmo, t,
+			var job = JobMaker.MakeJob(Defs.JobDefOf.LTS_FetchAmmo, t,
 				AmmoLogic.GetWornKits(pawn)?.FirstOrDefault(x =>
 						x.KitComp.Bags.Any(y => y.ChosenAmmo.defName == t.def.defName && y.Count < y.MaxCount)));
 

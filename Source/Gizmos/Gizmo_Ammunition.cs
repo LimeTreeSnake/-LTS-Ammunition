@@ -1,5 +1,4 @@
 ﻿using Ammunition.Components;
-using Ammunition.Defs;
 using Ammunition.Logic;
 using System;
 using System.Collections.Generic;
@@ -48,7 +47,7 @@ namespace Ammunition.Gizmos
 
 		public override float GetWidth(float maxWidth)
 		{
-			return (GetColumnWidth() * (int)Math.Ceiling((double)(_kitComp.Bags.Count)));
+			return GetColumnWidth() * (int)Math.Ceiling((double)(_kitComp?.Bags?.Count ?? 1));
 		}
 
 		private static float GetColumnWidth()
@@ -69,22 +68,22 @@ namespace Ammunition.Gizmos
 				if (_kitComp != null && AmmoLogic.HaveAmmo && _kitComp.Bags.Any())
 				{
 					var borderRect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
-					Material material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
+					var material = (this.disabled || parms.lowLight) ? TexUI.GrayscaleGUI : null;
 					//GenUI.DrawTextureWithMaterial(borderRect, parms.shrunk ? Command.BGTexShrunk : Command.BGTex,	material);
 					Widgets.DrawMenuSection(borderRect);
 
-					for (int i = 0; i < _kitComp.Bags.Count; i++)
+					for (var i = 0; i < _kitComp.Bags.Count; i++)
 					{
-						AmmoSlot slot = _kitComp.Bags[i];
+						var slot = _kitComp.Bags[i];
 						if (slot.ChosenAmmo == null)
 						{
-							slot.ChosenAmmo = AmmoLogic.AvailableAmmo.First();
+							slot.ChosenAmmo = Settings.Settings.AvailableAmmo.First();
 						}
 
-						int columns = (int)Math.Ceiling((double)(i + 1));
-						Rect innerRect = borderRect.ContractedBy(Margin);
+						var columns = (int)Math.Ceiling((double)(i + 1));
+						var innerRect = borderRect.ContractedBy(Margin);
 
-						int x = (int)(GetColumnWidth() * columns);
+						var x = (int)(GetColumnWidth() * columns);
 						innerRect.width = GetColumnWidth() - (Margin * 2);
 						innerRect.x = borderRect.x + (x - GetColumnWidth());
 						if (i < 2)
@@ -93,7 +92,7 @@ namespace Ammunition.Gizmos
 						}
 
 
-						innerRect.SplitVerticallyWithMargin(out Rect recImage, out Rect recAmmoGizmo, out _,
+						innerRect.SplitVerticallyWithMargin(out var recImage, out var recAmmoGizmo, out _,
 							Margin, null, ControlsWidth);
 
 						if (!Settings.Settings.UseCompactGizmo)
@@ -108,15 +107,15 @@ namespace Ammunition.Gizmos
 							}
 						}
 
-						recAmmoGizmo.SplitVerticallyWithMargin(out Rect recLeft, out Rect recRight, out _,
+						recAmmoGizmo.SplitVerticallyWithMargin(out var recLeft, out var recRight, out _,
 							Margin, null, UtilityWidth);
 
-						recLeft.SplitHorizontallyWithMargin(out Rect recLeftTop, out Rect recLeftBot, out _,
+						recLeft.SplitHorizontallyWithMargin(out var recLeftTop, out var recLeftBot, out _,
 							Margin, recAmmoGizmo.height / 2);
 
 						Widgets.DrawBoxSolid(recLeftTop, Widgets.WindowBGFillColor);
 						Widgets.DrawBoxSolid(recLeftBot, Widgets.WindowBGFillColor);
-						recRight.SplitHorizontallyWithMargin(out Rect recRightTop, out Rect recRightBot, out _,
+						recRight.SplitHorizontallyWithMargin(out var recRightTop, out var recRightBot, out _,
 							Margin, recAmmoGizmo.height / 2);
 
 						Widgets.DrawBoxSolid(recRightTop, Widgets.WindowBGFillColor);
@@ -127,13 +126,13 @@ namespace Ammunition.Gizmos
 							Widgets.DrawHighlight(recLeftTop);
 						}
 
-						float fillPercent = slot.Count / Mathf.Max(1f, slot.MaxCount);
+						var fillPercent = slot.Count / Mathf.Max(1f, slot.MaxCount);
 						if (fillPercent > 1f)
 						{
 							fillPercent = 1f;
 						}
 
-						float max = (float)slot.MaxCount / slot.Capacity;
+						var max = (float)slot.MaxCount / slot.Capacity;
 						Widgets.DraggableBar(recLeftBot,
 							_ammoBarTex,
 							_ammoBarTexHighlightTex,
@@ -158,7 +157,7 @@ namespace Ammunition.Gizmos
 						Widgets.Label(recLeftBot, slot.Count + " / " + slot.MaxCount);
 						if (Widgets.ButtonImage(recRightTop, Settings.Settings.DropIcon) && slot.Count > 0)
 						{
-							Thing ammo = ThingMaker.MakeThing(slot.ChosenAmmo);
+							var ammo = ThingMaker.MakeThing(slot.ChosenAmmo);
 							ammo.stackCount = slot.Count;
 							GenPlace.TryPlaceThing(ammo, _kitComp.parent.PositionHeld, Find.CurrentMap,
 								ThingPlaceMode.Near);
@@ -168,7 +167,7 @@ namespace Ammunition.Gizmos
 						}
 
 						TooltipHandler.TipRegion(recRightTop, Language.Translate.DropAll);
-						Texture2D image = slot.Use ? Settings.Settings.TrueIcon : Settings.Settings.FalseIcon;
+						var image = slot.Use ? Settings.Settings.TrueIcon : Settings.Settings.FalseIcon;
 						if (Widgets.ButtonImage(recRightBot, image))
 						{
 							slot.Use = !slot.Use;
@@ -192,12 +191,12 @@ namespace Ammunition.Gizmos
 
 		private IEnumerable<Widgets.DropdownMenuElement<ThingDef>> GenerateAmmoMenu(AmmoSlot ammoSlot)
 		{
-			using (List<ThingDef>.Enumerator enumerator = AmmoLogic.AvailableAmmo.ToList().GetEnumerator())
+			using (var enumerator = Settings.Settings.AvailableAmmo.ToList().GetEnumerator())
 			{
-				bool yielded = false;
+				var yielded = false;
 				while (enumerator.MoveNext())
 				{
-					ThingDef ammoDef = enumerator.Current;
+					var ammoDef = enumerator.Current;
 
 					if (ammoDef == null)
 					{

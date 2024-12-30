@@ -7,6 +7,7 @@
             <recipeUsers>
                 <li>ElectricTailoringBench</li>
                 <li>HandTailoringBench</li>
+                <li>LTS_AmmunitionBench</li>
                 <li MayRequire="DankPyon.Medieval.Overhaul">DankPyon_Workbench</li>
                 <li>CraftingSpot</li>
             </recipeUsers>
@@ -21,12 +22,14 @@
         <soundInteract>Standard_Pickup</soundInteract>
         <tradeability>All</tradeability>
         <apparel>
+            <wearPerDay>0</wearPerDay>
+            <careIfDamaged>false</careIfDamaged>
+            <countsAsClothingForNudity>false</countsAsClothingForNudity>
             <bodyPartGroups>
                 <li>Waist</li>
                 <li>Torso</li>
                 <li>HeadAttackTool</li>
             </bodyPartGroups>
-            <countsAsClothingForNudity>false</countsAsClothingForNudity>
             <tags>
                 <li>Kits</li>
             </tags>
@@ -48,7 +51,7 @@
             <Mass>2</Mass>
             <WorkToMake>1000</WorkToMake>
             <Flammability>0.6</Flammability>
-            <EquipDelay>2</EquipDelay>
+            <EquipDelay>1</EquipDelay>
         </statBases>
         <costStuffCount>20</costStuffCount>
         <apparel>
@@ -57,8 +60,7 @@
         <comps>
             <li Class="Ammunition.Components.CompProps_Kit">
                 <ammoCapacity>
-                    <li>30</li>
-                    <li>30</li>
+                    <li>90</li>
                 </ammoCapacity>
             </li>
         </comps>
@@ -73,6 +75,9 @@
             <graphicClass>Graphic_Single</graphicClass>
         </graphicData>
         <costStuffCount>40</costStuffCount>
+        <equippedStatOffsets>
+            <MoveSpeed>-0.1</MoveSpeed>
+        </equippedStatOffsets>
         <statBases>
             <!-- 0.25 per ammo -->
             <Mass>4</Mass>
@@ -83,8 +88,7 @@
         <comps>
             <li Class="Ammunition.Components.CompProps_Kit">
                 <ammoCapacity>
-                    <li>60</li>
-                    <li>60</li>
+                    <li>180</li>
                 </ammoCapacity>
             </li>
         </comps>
@@ -99,20 +103,21 @@
             <graphicClass>Graphic_Single</graphicClass>
         </graphicData>
         <costStuffCount>60</costStuffCount>
+        <equippedStatOffsets>
+            <MoveSpeed>-0.25</MoveSpeed>
+        </equippedStatOffsets>
         <statBases>
             <!-- 0.25 per ammo -->
             <Mass>6</Mass>
             <WorkToMake>2000</WorkToMake>
             <Flammability>0.6</Flammability>
-            <EquipDelay>2</EquipDelay>
+            <EquipDelay>3</EquipDelay>
         </statBases>
         <comps>
             <li Class="Ammunition.Components.CompProps_Kit">
                 <ammoCapacity>
-                    <li>60</li>
-                    <li>60</li>
-                    <li>60</li>
-                    <li>60</li>
+                    <li>180</li>
+                    <li>180</li>
                 </ammoCapacity>
             </li>
         </comps>

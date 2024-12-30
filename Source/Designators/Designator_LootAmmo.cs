@@ -1,8 +1,6 @@
 ﻿using RimWorld;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
@@ -38,7 +36,7 @@ namespace Ammunition.Designators {
             return true;
         }
         public override void DesignateSingleCell(IntVec3 c) {
-            foreach (Thing item in LootablesInCell(c)) {
+            foreach (var item in LootablesInCell(c)) {
                 DesignateThing(item);
             }
         }
@@ -51,8 +49,8 @@ namespace Ammunition.Designators {
                 yield break;
             }
 
-            List<Thing> thingList = c.GetThingList(this.Map);
-            foreach (Thing t in thingList.Where(t => CanDesignateThing(t).Accepted))
+            var thingList = c.GetThingList(this.Map);
+            foreach (var t in thingList.Where(t => CanDesignateThing(t).Accepted))
             {
 	            yield return t;
             }

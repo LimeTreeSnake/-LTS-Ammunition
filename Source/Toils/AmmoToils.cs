@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Ammunition.Logic;
-using Ammunition.Models;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -19,16 +18,16 @@ namespace Ammunition.Toils
 				var toil = new Toil();
 				toil.initAction = delegate
 				{
-					Pawn actor = toil.actor;
-					Thing thing = actor.CurJob.GetTarget(ind).Thing;
-					foreach (AmmoSlot t in kit.Bags)
+					var actor = toil.actor;
+					var thing = actor.CurJob.GetTarget(ind).Thing;
+					foreach (var t in kit.Bags)
 					{
 						if (t.ChosenAmmo != thing.def)
 						{
 							continue;
 						}
 
-						int amount = Mathf.Min(thing.stackCount, t.MaxCount - t.Count);
+						var amount = Mathf.Min(thing.stackCount, t.MaxCount - t.Count);
 						if (amount > 0)
 						{
 							thing.SplitOff(amount);
@@ -66,8 +65,8 @@ namespace Ammunition.Toils
 				var toil = new Toil();
 				toil.initAction = delegate
 				{
-					Pawn actor = toil.actor;
-					Job curJob = actor.jobs.curJob;
+					var actor = toil.actor;
+					var curJob = actor.jobs.curJob;
 
 					bool Validator(Thing t)
 					{
@@ -86,7 +85,7 @@ namespace Ammunition.Toils
 
 					}
 
-					Thing ammo = GenClosest.ClosestThing_Global_Reachable(actor.Position, actor.Map,
+					var ammo = GenClosest.ClosestThing_Global_Reachable(actor.Position, actor.Map,
 						actor.Map.listerThings.ThingsOfDef(def), PathEndMode.OnCell, TraverseParms.For(actor), 10,
 						Validator);
 
@@ -119,8 +118,8 @@ namespace Ammunition.Toils
 				var toil = new Toil();
 				toil.initAction = delegate
 				{
-					Pawn actor = toil.actor;
-					Thing thing = actor.CurJob.GetTarget(ind).Thing;
+					var actor = toil.actor;
+					var thing = actor.CurJob.GetTarget(ind).Thing;
 
 					AmmoLogic.EmptyKitAt(kit, thing.PositionHeld);
 					thing.def.soundInteract?.PlayOneShot(new TargetInfo(actor.Position, actor.Map));

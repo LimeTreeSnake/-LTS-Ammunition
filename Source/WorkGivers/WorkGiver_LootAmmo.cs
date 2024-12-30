@@ -1,10 +1,5 @@
-﻿using Ammunition.Components;
-using RimWorld;
-using System;
+﻿using RimWorld;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -22,7 +17,7 @@ namespace Ammunition.WorkGivers {
         }
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn) {
-            foreach (Designation item in pawn.Map.designationManager.SpawnedDesignationsOfDef(Defs.DesignationDefOf.LTS_LootAmmo)) {
+            foreach (var item in pawn.Map.designationManager.SpawnedDesignationsOfDef(Defs.DesignationDefOf.LTS_LootAmmo)) {
                 if (!item.target.HasThing) {
                     Log.ErrorOnce("Loot ammo designation has no target.", 63126);
                 }
@@ -31,9 +26,11 @@ namespace Ammunition.WorkGivers {
                 }
             }
         }
+        
         public override bool ShouldSkip(Pawn pawn, bool forced = false) {
             return !pawn.Map.designationManager.AnySpawnedDesignationOfDef(Defs.DesignationDefOf.LTS_LootAmmo);
         }
+        
         public override bool HasJobOnThing(Pawn pawn, Thing t, bool forced = false) {
             if (t.Map.designationManager.DesignationOn(t, Defs.DesignationDefOf.LTS_LootAmmo) == null) {
                 return false;
@@ -49,6 +46,7 @@ namespace Ammunition.WorkGivers {
 
             return true;
         }
+        
         public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false) {
             return JobMaker.MakeJob(Defs.JobDefOf.LTS_LootAmmo, t);
         }

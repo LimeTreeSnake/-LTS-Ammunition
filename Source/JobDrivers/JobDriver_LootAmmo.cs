@@ -34,7 +34,7 @@ namespace Ammunition.JobDrivers
 			{
 				initAction = delegate
 				{
-					Thing thing = this.job.targetA.Thing;
+					var thing = this.job.targetA.Thing;
 					this.Map.designationManager.DesignationOn(thing, Defs.DesignationDefOf.LTS_LootAmmo)?.Delete();
 					Logic.AmmoLogic.LootAmmo(thing);
 					this.pawn.records.Increment(Defs.RecordDefOf.LTS_BodiesLooted);

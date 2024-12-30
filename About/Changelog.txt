@@ -1,4 +1,20 @@
 ﻿[LTS]Ammunition - Framework
+2024-12
+    - CanBeLootedByColony null exception when checking on certain things fixed.
+    - Refactured and optimized some code
+    - Altered the GetWidth for gizmos to be more defensive.
+
+2024-08-27
+    - Kits no longer degrade upon being worn.
+    - Basic kits default sizes changed.
+        Small-> 2 bags 30+30  -> 1 bag 90
+        Medium-> 2 bags 60+60  -> 1 bag 180
+        Large-> 4 bags 60+60+60+60  -> 2 bag 180+180
+    - Large and Medium Kits affect move speed. (-0.25 & -0.1)
+    - Ammo work bench can now craft kits.
+    - Hellcat rifle and other that did not appear, 
+    
+
 2024-03-29
     - Updated to 1.5, kept 1.4 as was.
     - Hovering over ammo in mod settings shows their label and description. This to easier compare ammo vs default damage for possible weapons.

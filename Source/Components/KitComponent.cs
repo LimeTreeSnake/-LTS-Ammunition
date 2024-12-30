@@ -1,12 +1,10 @@
-﻿using RimWorld;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 using System.Linq;
 using Ammunition.Logic;
 using Ammunition.Models;
 using Ammunition.DefModExtensions;
-using Ammunition.Defs;
-using UnityEngine;
+using Ammunition.Settings;
 
 namespace Ammunition.Components
 {
@@ -37,9 +35,9 @@ namespace Ammunition.Components
 		
 		#endregion Properties
 
-		public override void Initialize(CompProperties props)
+		public override void Initialize(CompProperties properties)
 		{
-			base.Initialize(props);
+			base.Initialize(properties);
 			InitializeBags();
 		}
 
@@ -50,13 +48,13 @@ namespace Ammunition.Components
 				_bags = new List<AmmoSlot>();
 			}
 
-			if (Settings.Settings.BagSettingsDictionary.TryGetValue(this.parent.def.defName, out List<int> bagSettings))
+			if (Settings.Settings.BagSettingsDictionary.TryGetValue(this.parent.def.defName, out var bagSettings))
 			{
-				foreach (AmmoSlot bag in bagSettings.Select(t => new AmmoSlot
+				foreach (var bag in bagSettings.AmmoCapacities.Select(t => new AmmoSlot
 				         {
 					         Capacity = t,
 					         Count = 0,
-					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
+					         ChosenAmmo = Settings.Settings.AvailableAmmo.First(),
 					         Use = true
 				         }))
 				{
@@ -70,11 +68,11 @@ namespace Ammunition.Components
 					return;
 				}
 
-				foreach (AmmoSlot bag in compPropsKit.ammoCapacity.Select(t => new AmmoSlot
+				foreach (var bag in compPropsKit.ammoCapacity.Select(t => new AmmoSlot
 				         {
 					         Capacity = t,
 					         Count = 0,
-					         ChosenAmmo = AmmoLogic.AvailableAmmo.First(),
+					         ChosenAmmo = Settings.Settings.AvailableAmmo.First(),
 					         Use = true
 				         }))
 				{
@@ -107,13 +105,13 @@ namespace Ammunition.Components
 				return;
 			}
 
-			if (AmmoLogic.IsExempt(pawn.equipment.Primary.def.defName))
+			if (AmmoLogic.IsExempt(pawn.equipment.Primary.def))
 			{
 				return;
 			}
 
-			List<AmmoCategoryDef> ammoCategories =
-				AmmoLogic.AvailableAmmoForWeapon(pawn.equipment.Primary.def.defName);
+			var ammoCategories =
+				AmmoLogic.AvailableAmmoForWeapon(pawn.equipment.Primary.def);
 
 			if (ammoCategories == null || !ammoCategories.Any())
 			{
@@ -121,15 +119,15 @@ namespace Ammunition.Components
 				return;
 			}
 
-			string ammoDefName = ammoCategories.RandomElement().ammoDefs.FirstOrDefault();
-			ThingDef ammoDef = AmmoLogic.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
+			var ammoDefName = ammoCategories.RandomElement().ammoDefs.FirstOrDefault();
+			var ammoDef = Settings.Settings.AvailableAmmo.FirstOrDefault(x => x.defName == ammoDefName);
 			if (ammoDef == null)
 			{
 				return;
 			}
 
-			foreach (AmmoSlot t in _bags.Where(t =>
-				         !AmmoLogic.WeaponDefCanUseAmmoDef(pawn.equipment.Primary.def.defName, t.ChosenAmmo.defName)))
+			foreach (var t in _bags.Where(t =>
+				         !AmmoLogic.WeaponDefCanUseAmmoDef(pawn.equipment.Primary.def, t.ChosenAmmo)))
 			{
 				t.ChosenAmmo = ammoDef;
 			}

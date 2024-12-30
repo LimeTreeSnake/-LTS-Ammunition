@@ -5,7 +5,6 @@ using System.Linq;
 using Verse;
 using Ammunition.Gizmos;
 using Ammunition.Logic;
-using Ammunition.Models;
 
 namespace Ammunition.Things {
     [StaticConstructorOnStartup]
@@ -18,13 +17,13 @@ namespace Ammunition.Things {
         }
 
         public override IEnumerable<Gizmo> GetWornGizmos() {
-            foreach (Gizmo item in base.GetWornGizmos()) {
+            foreach (var item in base.GetWornGizmos()) {
                 yield return item;
             };
             if (Find.Selector.SelectedPawns.Count > 1 && Settings.Settings.HideMultipleGizmos) {
                 yield break;
             }
-            if (AmmoLogic.AvailableAmmo.EnumerableNullOrEmpty()) {
+            if (Settings.Settings.AvailableAmmo.EnumerableNullOrEmpty()) {
                 yield break;
             }
             Initiate();
